@@ -116,6 +116,16 @@ return array(
                             ),
                         ),
                     ),
+                    'cart' => array(
+                        'type' => 'Literal',
+                        'options' => array(
+                            'route' => '/cart',
+                            'defaults' => array(
+                                'controller' => 'User\Controller\Cart',
+                                'action' => 'get',
+                            ),
+                        ),
+                    ),
                     'settings' => array(
                         'type' => 'Literal',
                         'options' => array(
@@ -135,6 +145,7 @@ return array(
         'invokables' => array(
             'User\Controller\Session' => 'User\Controller\SessionController',
             'User\Controller\Account' => 'User\Controller\AccountController',
+            'User\Controller\Cart' => 'User\Controller\CartController',
         ),
     ),
 
