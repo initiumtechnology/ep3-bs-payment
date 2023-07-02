@@ -63,6 +63,22 @@ class PaymentService extends AbstractService
                 'paypal_ec', $model, $proxyurl.$basepath.'/payment/booking/done');
         }
         #paypal checkout
+        //https://eway.io/api-v3/?php#direct-connection
+        #eway checkout
+        if ($payservice == 'omnipay') {
+            $model['CurrencyCode'] = 'AUD';
+            $model['TotalAmount'] = $total/100;
+            $model['InvoiceNumber'] = $booking->get('bid');
+            $model['InvoiceDescription'] = $description;
+            $model['Email'] = $user->get('email');
+            $storage->update($model);
+            $captureToken = $this->getServiceLocator()->get('payum.security.token_factory')->createCaptureToken(
+                'omnipay', $model, $proxyurl.$basepath.'/payment/booking/confirm');
+        }
+        // so basically it goes from payum.security.token_factory -> payum_capture_do -> /payment/capture[/:payum_token]',
+        #eway checkout
+
+
         #stripe checkout
         if ($payservice == 'stripe') {
             $model["payment_method_types"] = $this->configManager->need('stripePaymentMethods');

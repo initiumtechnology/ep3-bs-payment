@@ -12,7 +12,7 @@ $project_config = require 'config/autoload/project.php';
 
 return array_merge($project_config, array(
     'db' => array(
-        'database' => 'ep3',
+        'database' => 'ep3-charlotte',
         'username' => 'root',
         'password' => 'root',
 
@@ -34,11 +34,6 @@ return array_merge($project_config, array(
     'i18n' => array(
         'choice' => array(
             'en-US' => 'English',
-            'de-DE' => 'Deutsch'
-
-            // More possible languages:
-            // 'fr-FR' => 'Français',
-            // 'hu-HU' => 'Magyar',
         ),
 
         'currency' => 'AUD',
@@ -72,6 +67,13 @@ return array_merge($project_config, array(
                 'secret' => '?',
                 'merchant_id' => '?',
                 'sandbox' => false
+            )),
+            'omnipay' => (new Payum\OmnipayBridge\OmnipayGatewayFactory())->create(array(
+                'payum.api' => new \Omnipay\Eway\RapidDirectGateway(),
+                'factory' => 'omnipay',
+                'apiKey' => 'F9802CUtOt/sHQiuNudZJ4/5gxHrMzSlyrVEQtzFosCqOxnrtaqHcJl0eUO6T1/2hN0RGe',
+                'password' => 'INuX1EFC',
+                'testMode' => true
             )),
         ),
         'storages' => array(

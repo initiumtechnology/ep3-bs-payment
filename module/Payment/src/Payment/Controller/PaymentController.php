@@ -91,6 +91,14 @@ class PaymentController extends AbstractActionController
             $paymentNotes = ' direct pay with paypal - ';
         }
 #paypal
+#eway
+        if ($token->getGatewayName() == 'omnipay') {
+            $bid = $payment['PAYMENTREQUEST_0_BID'];
+            $paymentNotes = ' direct pay with eway - ';
+        }
+
+#eway
+
 #stripe
         if ($token->getGatewayName() == 'stripe') {
             $bid = $payment['metadata']['bid'];

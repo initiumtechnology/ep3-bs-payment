@@ -16,7 +16,10 @@
         "stripe/stripe-php": "6.9.0",
         "payum/stripe": "^1.6",
         "payum/klarna-checkout": "^1.5",
-        "eluceo/ical": "^0.16.0"
+        "eluceo/ical": "^0.16.0",
+        "omnipay/common": "2.3.0",
+        "payum/omnipay-bridge": "1.2.5",
+        "omnipay/eway": "^2.2"
     },
 
     "autoload": {
@@ -32,5 +35,10 @@
         "type": "git",
         "url": "https://github.com/lolmx/Stripe.git"
     }
-    ]    
+    ],
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    }
 }

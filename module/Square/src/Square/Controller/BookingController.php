@@ -160,6 +160,12 @@ class BookingController extends AbstractActionController
         if ($this->config('paypal') != null && $this->config('paypal') == true) {  
             $byproducts['paypal'] = true;
         }
+
+        /* display payment checkout */
+        if ($this->config('omnipay') != null && $this->config('omnipay') == true) {  
+                    $byproducts['omnipay'] = true;
+        }
+
         if ($this->config('stripe') != null && $this->config('stripe') == true) {
             $byproducts['stripe'] = true;
             $byproducts['stripePaymentMethods'] = $this->config('stripePaymentMethods');
@@ -274,13 +280,13 @@ class BookingController extends AbstractActionController
             $payservice = $this->params()->fromPost('paymentservice');
             $meta = array('player-names' => serialize($playerNames), 'notes' => $notes); 
             
-            if (($payservice == 'paypal' || $payservice == 'stripe' || $payservice == 'klarna') && $payable) {
+            if (($payservice == 'paypal' || $payservice == 'stripe' || $payservice == 'klarna' || $payservice = 'omnipay') && $payable) {
                    $meta['directpay'] = 'true';
             }
 
             $booking = $bookingService->createSingle($user, $square, $quantityParam, $byproducts['dateStart'], $byproducts['dateEnd'], $bills, $meta);
             
-            if (($payservice == 'paypal' || $payservice == 'stripe' || $payservice == 'klarna') && $payable) {
+            if (($payservice == 'paypal' || $payservice == 'stripe' || $payservice == 'klarna' || $payservice = 'omnipay') && $payable) {
             # payment checkout
                 if($payable) {
                    // $paymentService = $serviceManager->get('Payment\Service\PaymentService'); 
@@ -324,12 +330,25 @@ class BookingController extends AbstractActionController
                            'paypal_ec', $model, $proxyurl.$basepath.'/square/booking/payment/done');
                    }				    
                    #paypal checkout
+                    //https://eway.io/api-v3/?php#direct-connection
+                    #eway checkout
+                    if ($payservice == 'omnipay') {
+                        $model['CurrencyCode'] = 'AUD';
+                        $model['TotalAmount'] = $total * 100;
+                        $model['InvoiceNumber'] = $booking->get('bid');
+                        $model['InvoiceDescription'] = $description;
+                        $model['Email'] = $user->get('email');
+                        $storage->update($model);
+                        $captureToken = $this->getServiceLocator()->get('payum.security.token_factory')->createCaptureToken(
+                            'omnipay', $model, $proxyurl.$basepath.'/square/payment/booking/confirm');
+                    }
+                    // so basically it goes from payum.security.token_factory -> payum_capture_do -> /payment/capture[/:payum_token]',
+                   #eway checkout                   
                    #stripe checkout
                    if ($payservice == 'stripe') {
-                       $model["payment_method_types"] = $this->config('stripePaymentMethods');                       
+                       $model["payment_method_types"] = $this->config('stripePaymentMethods');
                        // nur zusammen mit stripe customer objekt
                        // $model["payment_method_options"] = $this->config('stripePaymentMethodOptions');
-                       
                        $model["amount"] = $total;
                        $model["currency"] = 'EUR';
                        $model["description"] = $description;
@@ -590,6 +609,12 @@ class BookingController extends AbstractActionController
             $paymentNotes = ' direct pay with paypal - ';
         }
 #paypal
+#eway
+        if ($token->getGatewayName() == 'omnipay') {
+            $bid = $payment['PAYMENTREQUEST_0_BID'];
+            $paymentNotes = ' direct pay with eway - ';
+        }
+#eway
 #stripe
         if ($token->getGatewayName() == 'stripe') {
             $bid = $payment['metadata']['bid'];

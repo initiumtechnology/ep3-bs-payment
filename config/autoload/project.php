@@ -41,14 +41,14 @@ return array(
     // 'tmpBookingAt' => '?',
     // enable/disable specific payment providers 
     'paypal' => false,
-    'stripe' => true,
+    'stripe' => false,
     // enable/disable stripe payment methods (possible values: card, sepa_debit, ideal, giropay, sofort)
     'stripePaymentMethods' => array(
         'card',
         //'sepa_debit'
     ),
     // enable/disable stripe PaymentRequest (pmr) API for apple / google pay  
-    'stripePaymentRequest' => 'false',
+    'stripePaymentRequest' => true,
     // select the suitable icon for the selected stripe payment methods from imgs-client/layout/card_sepa  
     'stripeIcon' => 'card_ideal_sepa.png',
     // select a default method 
@@ -58,12 +58,12 @@ return array(
     // stripe webhook secret for update of pending PaymentIntents
     'stripeWebhookSecret' => '',
     // cancel automatic the booking if payment_intent from stripe fails
-    'stripeWebhookCancel' => true, 
+    'stripeWebhookCancel' => false, 
     // not yet fully implemented
     'klarna' => false,
     // classic behaviour of ep3-bs with booking on bill 
     'billing' => true,
     // select which payment provider should be activated as default 
-    'payment_default' => 'stripe',
+    'payment_default' => 'omnipay'
 );
 
