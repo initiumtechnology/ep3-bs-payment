@@ -83,7 +83,7 @@ class PaymentService extends AbstractService
         if ($payservice == 'stripe') {
             $model["payment_method_types"] = $this->configManager->need('stripePaymentMethods');
             $model["amount"] = $total;
-            $model["currency"] = 'EUR';
+            $model["currency"] = 'AUD';
             $model["description"] = $description;
             $model["receipt_email"] = $user->get('email');
             $model["metadata"] = array('bid' => $booking->get('bid'), 'productName' => $this->optionManager->need('subject.type'), 'locale' => $locale, 'instance' => $basepath, 'projectShort' => $projectShort, 'userName' => $userName, 'companyName' => $companyName, 'stripeDefaultPaymentMethod' => $this->configManager->need('stripeDefaultPaymentMethod'), 'stripeAutoConfirm' => var_export($this->configManager->need('stripeAutoConfirm'), true), 'stripePaymentRequest' => var_export($this->configManager->need('stripePaymentRequest'), true));

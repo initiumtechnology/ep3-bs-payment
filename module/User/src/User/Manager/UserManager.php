@@ -46,7 +46,7 @@ class UserManager extends AbstractManager
      */
     public function create($alias, $status = 'placeholder', $email = null, $pw = null, array $meta = array())
     {
-        if (! (is_string($alias) && strlen($alias) >= 3)) {
+        if (! (is_string($alias) && strlen($alias) >= 1)) {
             throw new InvalidArgumentException('User name too short');
         }
 

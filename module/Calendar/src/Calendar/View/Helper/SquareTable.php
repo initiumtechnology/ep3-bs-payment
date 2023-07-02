@@ -12,7 +12,7 @@ class SquareTable extends AbstractHelper
         $view = $this->getView();
         $html = '';
 
-        $html .= '<table class="calendar-square-table" style="width: 192px;">';
+        $html .= '<table class="calendar-square-table full-width"">';
         $html .= '<tr class="calendar-date-row"><td>&nbsp;</td></tr>';
 
         if ($timeBlockCount > 1) {

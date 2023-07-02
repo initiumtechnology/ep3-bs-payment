@@ -104,7 +104,7 @@
  
         </section>
 
-  <button type="submit">{{ model.metadata.locale != 'de-DE' ? 'Pay' : '' }} €{{ model.amount/100 }} {{ model.metadata.locale == 'de-DE' ? 'zahlen' : '' }}</button>
+  <button type="submit">{{ model.metadata.locale != 'de-DE' ? 'Pay' : '' }} A${{ model.amount/100 }} {{ model.metadata.locale == 'de-DE' ? 'zahlen' : '' }}</button>
 
 </form> 
 
@@ -123,13 +123,13 @@
           <p class="sku"></p>
         </div>
         <p class="count">{{ model.quantity|default(1) }}</p>
-        <p class="price">€{{ model.amount/100 }}</p>
+        <p class="price">A${{ model.amount/100 }}</p>
         </div>
     </div>
     <div id="order-total">
       <div class="line-item total">
         <p class="label">Total</p>
-        <p class="price" data-total>€{{ model.amount/100 }}</p>
+        <p class="price" data-total>A${{ model.amount/100 }}</p>
       </div>
 
     </div>
@@ -300,7 +300,7 @@
     // Update the main button to reflect the payment method being selected.
     const updateButtonLabel = (paymentMethod, bankName) => {
       let name = paymentMethods[paymentMethod].name;
-      let amount = '€{{ model.amount/100 }}';
+      let amount = 'A${{ model.amount/100 }}';
       let l_pay1 = '{{ model.metadata.locale != 'de-DE' ? 'Pay ' : '' }}';
       let l_pay2 = '{{ model.metadata.locale == 'de-DE' ? ' zahlen' : '' }}';
       let l_with = '{{ model.metadata.locale != 'de-DE' ? ' with ' : ' mit ' }}';

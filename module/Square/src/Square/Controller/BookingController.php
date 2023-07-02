@@ -350,7 +350,7 @@ class BookingController extends AbstractActionController
                        // nur zusammen mit stripe customer objekt
                        // $model["payment_method_options"] = $this->config('stripePaymentMethodOptions');
                        $model["amount"] = $total;
-                       $model["currency"] = 'EUR';
+                       $model["currency"] = 'AUD';
                        $model["description"] = $description;
                        $model["receipt_email"] = $user->get('email');
                        $model["metadata"] = array('bid' => $booking->get('bid'), 'productName' => $this->option('subject.type'), 'locale' => $locale, 'instance' => $basepath, 'projectShort' => $projectShort, 'userName' => $userName, 'companyName' => $companyName, 'stripeDefaultPaymentMethod' => $this->config('stripeDefaultPaymentMethod'), 'stripeAutoConfirm' => var_export($this->config('stripeAutoConfirm'), true), 'stripePaymentRequest' => var_export($this->config('stripePaymentRequest'), true));
@@ -395,6 +395,9 @@ class BookingController extends AbstractActionController
                        $storage->update($model);
                    }
                    #klarna checkout
+
+                   $this->flashMessenger()->addSuccessMessage(sprintf($this->t('%sPayment and Booking Succeed%s'),
+                       '<b>', '</b>'));
 
                    return $this->redirect()->toUrl($captureToken->getTargetUrl());
                    }

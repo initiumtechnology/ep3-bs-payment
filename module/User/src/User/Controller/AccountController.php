@@ -148,7 +148,7 @@ class AccountController extends AbstractActionController
                 $registrationData = $registrationForm->getData();
 
                 $meta = array();
-                $meta['gender'] = $registrationData['rf-gender'];
+                #$meta['gender'] = $registrationData['rf-gender'];
 
                 /* initialize user budget with 0 */
                 $meta['budget'] = 0;
@@ -161,16 +161,16 @@ class AccountController extends AbstractActionController
                 } else {
                     $meta['name'] = $registrationData['rf-firstname'];
 
-                    if ($meta['gender'] == 'male' || $meta['gender'] == 'female' || $meta['gender'] == 'family') {
-                        $meta['name'] = ucfirst($meta['name']);
-                    }
+                    // if ($meta['gender'] == 'male' || $meta['gender'] == 'female' || $meta['gender'] == 'family') {
+                    //     $meta['name'] = ucfirst($meta['name']);
+                    // }
 
                     $alias = $meta['name'];
                 }
 
-                $meta['street'] = $registrationData['rf-street'] . ' ' . $registrationData['rf-number'];
-                $meta['zip'] = $registrationData['rf-zip'];
-                $meta['city'] = $registrationData['rf-city'];
+                // $meta['street'] = $registrationData['rf-street'] . ' ' . $registrationData['rf-number'];
+                // $meta['zip'] = $registrationData['rf-zip'];
+                // $meta['city'] = $registrationData['rf-city'];
                 $meta['phone'] = $registrationData['rf-phone'];
 
                 if (! (isset($registrationData['rf-birthdate']) && preg_match('/^([ \,\-\.0-9\x{00c0}-\x{01ff}a-zA-Z]){4,}$/u', $registrationData['rf-birthdate']))) {
