@@ -53,8 +53,9 @@ class BookingController extends AbstractActionController
         return $this->ajaxViewModel($byproducts);
     }
 
-    public function confirmationAction()
+    public function addToCartAction()
     {
+        // Retrieve the booking details from the request parameters
         $dateStartParam = $this->params()->fromQuery('ds');
         $dateEndParam = $this->params()->fromQuery('de');
         $timeStartParam = $this->params()->fromQuery('ts');
@@ -64,11 +65,39 @@ class BookingController extends AbstractActionController
         $productsParam = $this->params()->fromQuery('p', 0);
         $playerNamesParam = $this->params()->fromQuery('pn', 0);
 
+        // Validate the booking details and retrieve the necessary services
         $serviceManager = $this->getServiceLocator();
         $squareValidator = $serviceManager->get('Square\Service\SquareValidator');
-
         $byproducts = $squareValidator->isBookable($dateStartParam, $dateEndParam, $timeStartParam, $timeEndParam, $squareParam);
+        $user = $byproducts['user'];
 
+        if (! $user) {
+            $query = $this->getRequest()->getUri()->getQueryAsArray();
+            $query['ajax'] = 'false';
+
+            $this->redirectBack()->setOrigin('square/booking/addtocart', [], ['query' => $query]);
+
+            return $this->redirect()->toRoute('user/login');
+        }
+
+        if (! $byproducts['bookable']) {
+            throw new RuntimeException(sprintf($this->t('This %s is already occupied'), $this->option('subject.square.type')));
+        }
+
+        // Store the booking details in the cart
+        $cartService = $serviceManager->get('Cart\Factory\Cart');
+        $cartService->addToCart($byproducts);
+
+        return $this->redirect()->toRoute('user/cart');
+    }
+
+    public function confirmationAction()
+    {
+        // Retrieve the booking details from the cart
+        $cartService = $this->getServiceLocator()->get('Cart\Service\CartService');
+        $byproducts = $cartService->getCart();
+
+        // Check if the user is logged in
         $user = $byproducts['user'];
 
         $query = $this->getRequest()->getUri()->getQueryAsArray();
@@ -82,6 +111,7 @@ class BookingController extends AbstractActionController
             $byproducts['url'] = $this->url()->fromRoute('square/booking/confirmation', [], ['query' => $query]);
         }
 
+        // Check if the booking is still available
         if (! $byproducts['bookable']) {
             throw new RuntimeException(sprintf($this->t('This %s is already occupied'), $this->option('subject.square.type')));
         }
