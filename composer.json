@@ -19,7 +19,9 @@
         "eluceo/ical": "^0.16.0",
         "omnipay/common": "2.3.0",
         "payum/omnipay-bridge": "1.2.5",
-        "omnipay/eway": "^2.2"
+        "omnipay/eway": "^2.2",
+        "php-http/message-factory": "^1.1",
+        "klarna/checkout": "^4.0"
     },
 
     "autoload": {
