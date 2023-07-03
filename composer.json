@@ -23,7 +23,8 @@
         "psr-4": {
             "Zend\\I18n\\": "module/Zend/I18n/src/",
             "Zend\\Stdlib\\": "module/Zend/Stdlib/src/",
-            "Zend\\View\\": "module/Zend/View/src/"
+            "Zend\\View\\": "module/Zend/View/src/",
+            "Cart\\Factory\\": "module/Square/src/Square/Factory/"
         }
     },    
     

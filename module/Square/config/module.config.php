@@ -1,105 +1,124 @@
 <?php
 
-return array(
-    'router' => array(
-        'routes' => array(
-            'square' => array(
+return [
+    'router' => [
+        'routes' => [
+            'square' => [
                 'type' => 'Literal',
-                'options' => array(
+                'options' => [
                     'route' => '/square',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => 'Square\Controller\Square',
                         'action' => 'index',
-                    ),
-                ),
+                    ],
+                ],
                 'may_terminate' => true,
-                'child_routes'  => array(
-                    'booking' => array(
+                'child_routes' => [
+                    'booking' => [
                         'type' => 'Literal',
-                        'options' => array(
+                        'options' => [
                             'route' => '/booking',
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => 'Square\Controller\Booking',
-                            ),
-                        ),
+                            ],
+                        ],
                         'may_terminate' => false,
-                        'child_routes'  => array(
-                            'customization' => array(
+                        'child_routes' => [
+                            'customization' => [
                                 'type' => 'Literal',
-                                'options' => array(
+                                'options' => [
                                     'route' => '/customization',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'action' => 'customization',
-                                    ),
-                                ),
-                            ),
-                            'addtocart' => array(
+                                    ],
+                                ],
+                            ],
+                            'addtocart' => [
                                 'type' => 'Literal',
-                                'options' => array(
+                                'options' => [
                                     'route' => '/addtocart',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'action' => 'addtocart',
-                                    ),
-                                ),
-                            ),
-                            'confirmation' => array(
+                                    ],
+                                ],
+                            ],
+                            'confirmation' => [
                                 'type' => 'Literal',
-                                'options' => array(
+                                'options' => [
                                     'route' => '/confirmation',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'action' => 'confirmation',
-                                    ),
-                                ),
-                            ),
-                            'cancellation' => array(
+                                    ],
+                                ],
+                            ],
+                            'cancellation' => [
                                 'type' => 'Literal',
-                                'options' => array(
+                                'options' => [
                                     'route' => '/cancellation',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'action' => 'cancellation',
-                                    ),
-                                ),
-                            ),
-                            'payment_done' => array(
+                                    ],
+                                ],
+                            ],
+                            'payment_done' => [
                                 'type' => 'segment',
-                                'options' => array(
+                                'options' => [
                                     'route'    => '/payment/done[/:payum_token]',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'action' => 'done',
-                                    ),
-                                ),
-                            ),
-                            'payment_confirm' => array(
+                                    ],
+                                ],
+                            ],
+                            'payment_confirm' => [
                                 'type' => 'segment',
-                                'options' => array(
+                                'options' => [
                                     'route'    => '/payment/confirm[/:payum_token]',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'action' => 'confirm',
-                                    ),
-                                ),
-                            ),
-                            'payment_webhook' => array(
+                                    ],
+                                ],
+                            ],
+                            'payment_webhook' => [
                                 'type' => 'Literal',
-                                'options' => array(
+                                'options' => [
                                     'route'    => '/payment/webhook',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'action' => 'webhook',
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        ),
-    ),
-
-    'controllers' => array(
-        'invokables' => array(
+                                    ],
+                                ],
+                            ],
+                            'my-booking' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/my-booking',
+                                    'defaults' => [
+                                        'controller' => 'Square\Controller\Booking',
+                                        'action' => 'myBooking',
+                                    ],
+                                ],
+                            ],
+                            'new-booking' => [
+                                'type' => 'Literal',
+                                'options' => [
+                                    'route' => '/new-booking',
+                                    'defaults' => [
+                                        'controller' => 'Square\Controller\Booking',
+                                        'action' => 'newBooking',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ],
+    'controllers' => [
+        'invokables' => [
             'Square\Controller\Square' => 'Square\Controller\SquareController',
             'Square\Controller\Booking' => 'Square\Controller\BookingController',
-        ),
-    ),
+        ],
+    ],
 
     'service_manager' => array(
         'factories' => array(
@@ -142,4 +161,4 @@ return array(
             'ViewJsonStrategy',
         ),
     ),
-);
+];

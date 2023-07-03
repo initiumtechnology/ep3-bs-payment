@@ -85,7 +85,7 @@ class BookingController extends AbstractActionController
         }
 
         // Store the booking details in the cart
-        $cartService = $serviceManager->get('Cart\Factory\Cart');
+        $cartService = $serviceManager->get('Square\Factory\Cart');
         $cartService->addToCart($byproducts);
 
         return $this->redirect()->toRoute('user/cart');
