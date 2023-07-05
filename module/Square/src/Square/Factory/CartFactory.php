@@ -1,22 +1,14 @@
 <?php
-namespace Cart\Factory;
 
-use Cart\Factory\Cart;
-use Interop\Container\ContainerInterface;
+namespace Square\Factory;
 
-class CartFactory
+use Zend\ServiceManager\FactoryInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
+
+class CartFactory implements FactoryInterface
 {
-    public function __invoke(ContainerInterface $container)
+    public function createService(ServiceLocatorInterface $sm)
     {
-        // Create an instance of the Cart object
-        $cart = new Cart();
-
-        // Retrieve the booking details from the container or any other source
-        $bookingDetails = $container->get('Booking\Details');
-
-        // Add the booking details to the cart
-        $cart->addBookings($bookingDetails);
-
-        return $cart;
+        return new Cart($sm->get('Zend\Db\Adapter\Adapter'));
     }
 }
