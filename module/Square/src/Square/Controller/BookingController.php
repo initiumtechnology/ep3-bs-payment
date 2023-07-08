@@ -17,6 +17,7 @@ use Payum\Core\Reply\ReplyInterface;
 use Payum\Stripe\Request\Confirm;
 use Stripe;
 use GuzzleHttp\Client; 
+use \Square\Factory\Cart;
 
 
 class BookingController extends AbstractActionController
@@ -155,8 +156,14 @@ class BookingController extends AbstractActionController
         }
 
         // Store the booking details in the cart
-        $cartService = \Square\Factory\Cart::getInstance();
-        $cartService->addToCart($byproducts);
+        $cartService = Cart::getInstance();
+
+        $cartService->addToCart([
+            'id' => 3,
+            'name' => 'Item 3',
+            'price' => 11.99,
+            'quantity' => 1,
+        ]);
 
         return $this->redirect()->toRoute('user/cart');
     }
