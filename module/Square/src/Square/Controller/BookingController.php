@@ -84,8 +84,78 @@ class BookingController extends AbstractActionController
             throw new RuntimeException(sprintf($this->t('This %s is already occupied'), $this->option('subject.square.type')));
         }
 
+        /* Check passed quantity */
+
+        if (! (is_numeric($quantityParam) && $quantityParam > 0)) {
+            throw new RuntimeException(sprintf($this->t('Invalid %s-amount choosen'), $this->option('subject.square.unit')));
+        }
+
+        $square = $byproducts['square'];
+
+        if ($square->need('capacity') - $byproducts['quantity'] < $quantityParam) {
+            throw new RuntimeException(sprintf($this->t('Too many %s for this %s choosen'), $this->option('subject.square.unit.plural'), $this->option('subject.square.type')));
+        }
+
+        $byproducts['quantityChoosen'] = $quantityParam;
+
+        /* Check passed products */
+
+        $products = array();
+
+        if (! ($productsParam === '0' || $productsParam === 0)) {
+            $productManager = $serviceManager->get('Square\Manager\SquareProductManager');
+            $productTuples = explode(',', $productsParam);
+
+            foreach ($productTuples as $productTuple) {
+                $productTupleParts = explode(':', $productTuple);
+
+                if (count($productTupleParts) != 2) {
+                    throw new RuntimeException('Malformed product parameter passed');
+                }
+
+                $spid = $productTupleParts[0];
+                $amount = $productTupleParts[1];
+
+                if (! (is_numeric($spid) && $spid > 0)) {
+                    throw new RuntimeException('Malformed product parameter passed');
+                }
+
+                if (! is_numeric($amount)) {
+                    throw new RuntimeException('Malformed product parameter passed');
+                }
+
+                $product = $productManager->get($spid);
+
+                $productOptions = explode(',', $product->need('options'));
+
+                if (! in_array($amount, $productOptions)) {
+                    throw new RuntimeException('Malformed product parameter passed');
+                }
+
+                $product->setExtra('amount', $amount);
+
+                $products[$spid] = $product;
+            }
+        }
+
+        $byproducts['products'] = $products;
+
+        /* Check passed player names */
+
+        if ($playerNamesParam) {
+            $playerNames = Json::decode($playerNamesParam, Json::TYPE_ARRAY);
+
+            foreach ($playerNames as $playerName) {
+                if (strlen(trim($playerName['value'])) < 5 || strpos(trim($playerName['value']), ' ') === false) {
+                    throw new \RuntimeException('Die <b>vollständigen Vor- und Nachnamen</b> der anderen Spieler sind erforderlich');
+                }
+            }
+        } else {
+            $playerNames = null;
+        }
+
         // Store the booking details in the cart
-        $cartService = $serviceManager->get('Square\Factory\Cart');
+        $cartService = \Square\Factory\Cart::getInstance();
         $cartService->addToCart($byproducts);
 
         return $this->redirect()->toRoute('user/cart');
