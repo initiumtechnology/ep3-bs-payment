@@ -4,27 +4,23 @@ namespace User\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
+use \Square\Factory\Cart;
 
 class CartController extends AbstractActionController
 {
     public function getAction()
     {
-        // Dummy array of cart items for testing
-        $cartItems = [
-            [
-                'id' => 1,
-                'name' => 'Item 1',
-                'price' => 10.99,
-                'quantity' => 2,
-            ],
-            [
-                'id' => 2,
-                'name' => 'Item 2',
-                'price' => 5.99,
-                'quantity' => 3,
-            ],
-            // Add more items as needed
-        ];
+
+        $cartService = Cart::getInstance();
+
+        // $cartService->addToCart([
+        //     'id' => 3,
+        //     'name' => 'Item 3',
+        //     'price' => 11.99,
+        //     'quantity' => 1,
+        // ]);
+
+        $cartItems = $cartService->getItems();
 
         $viewModel = new ViewModel([
             'cartItems' => $cartItems,
