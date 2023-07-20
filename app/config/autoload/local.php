@@ -31,8 +31,8 @@ return array(
     ),
     'i18n' => array(
         'choice' => array(
-            'en-US' => 'English',
-            'de-DE' => 'Deutsch'
+            // 'en-US' => 'English',
+            // 'de-DE' => 'Deutsch'
 
             // More possible languages:
             // 'fr-FR' => 'Français',
