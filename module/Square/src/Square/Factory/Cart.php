@@ -4,12 +4,24 @@ namespace Square\Factory;
 
 class Cart
 {
-    private static $instance;
+    private static $instance = null;
     private $items = [];
 
     private function __construct()
     {
-        // Private constructor to prevent direct instantiation
+        // Start the session if not already started
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Check if the cart exists in the session
+        if (!isset($_SESSION['cart'])) {
+            // If the cart doesn't exist, create an empty array to represent the cart
+            $_SESSION['cart'] = [];
+        }
+
+        // Load cart items from the session into the Cart object
+        $this->items = $_SESSION['cart'];
     }
 
     public static function getInstance()
@@ -23,11 +35,15 @@ class Cart
     public function addToCart($item)
     {
         $this->items[] = $item;
+        // Update the session with the latest cart items
+        $_SESSION['cart'] = $this->items;
     }
 
     public function getItems()
     {
-        // Dummy array of cart items for testing
+        print_r($this->items);
+
+        // // Dummy array of cart items for testing
         // $cartItems = [
         //     [
         //         'id' => 1,
@@ -43,8 +59,8 @@ class Cart
         //     ],
         //     // Add more items as needed
         // ];
-        
         // $this->items = $cartItems;
+
         return $this->items;
     }
 }
