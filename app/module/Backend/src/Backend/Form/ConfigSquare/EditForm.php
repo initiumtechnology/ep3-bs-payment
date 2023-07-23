@@ -136,7 +136,7 @@ class EditForm extends Form
                 'id' => 'cf-allow-notes',
             ),
             'options' => array(
-                'label' => 'Erlaube optionale Anmerkungen bei der Buchung',
+                'label' => 'Allow optional comments when booking',
             ),
         ));
 
@@ -252,9 +252,9 @@ class EditForm extends Form
                 'style' => 'width: 80px;',
             ),
             'options' => array(
-                'label' => 'Buchungsvorlauf',
-                'notes' => 'Auf 0 setzen, um den nächsten freien Zeitblock buchen zu dürfen',
-                'postfix' => 'Minuten',
+                'label' => 'Booking in advance',
+                'notes' => 'Set to 0 to be allowed to book the next free block of time',
+                'postfix' => 'Minutes',
             ),
         ));
 
@@ -280,9 +280,9 @@ class EditForm extends Form
                 'style' => 'width: 80px;',
             ),
             'options' => array(
-                'label' => 'Buchungen einschränken',
-                'notes' => 'Auf 0 setzen, um beliebig viele Buchungen zu erlauben',
-                'postfix' => 'gleichzeitige Buchung(en) pro Benutzer',
+                'label' => 'Restrict Bookings to',
+                'notes' => 'Set to 0 to allow unlimited bookings',
+                'postfix' => 'simultaneous booking(s) per user',
             ),
         ));
 
