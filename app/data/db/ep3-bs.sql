@@ -461,7 +461,8 @@ INSERT INTO `bs_options` (`oid`, `key`, `value`, `locale`) VALUES
 (29, 'service.calendar.display-club-exceptions', '0', NULL),
 (30, 'client.name.full', 'Pro Fit Badminton', 'en-US'),
 (31, 'client.contact.phone', '(03) 9558 9835', 'en-US'),
-(32, 'service.name.full', 'Booking system', 'en-US');
+(32, 'service.name.full', 'Booking system', 'en-US'),
+(33, 'company.name.full', 'Initium Technology', 'en-US');
 
 -- --------------------------------------------------------
 

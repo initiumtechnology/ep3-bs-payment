@@ -5,7 +5,7 @@
  */
 
 
-$instance = 'ep3-bs';
+$instance = 'public';
 
 return array(
     // basepath of the instance on your server - i.e. tvas-booking-dev for https://tennis-rudolstadt.de/tvas-booking-dev or '' if you don't have a basepath square/ i.e. 
@@ -48,7 +48,7 @@ return array(
         //'sepa_debit'
     ),
     // enable/disable stripe PaymentRequest (pmr) API for apple / google pay  
-    'stripePaymentRequest' => 'false',
+    'stripePaymentRequest' => 'true',
     // select the suitable icon for the selected stripe payment methods from imgs-client/layout/card_sepa  
     'stripeIcon' => 'card_ideal_sepa.png',
     // select a default method 

@@ -7,8 +7,9 @@
  */
 
 $detailsClass = 'Application\Model\PaymentDetails';
+$project_config = require 'config/autoload/project.php';
 
-return array(
+return array_merge($project_config, array(
     'db' => array(
         'database' => 'ep3bs',
         'username' => 'ep3bs',
@@ -76,4 +77,4 @@ return array(
             $detailsClass => new \Payum\Core\Storage\FilesystemStorage(__DIR__.'/../../data/payum', $detailsClass, 'id'),
         )
     ),
-);
+));
