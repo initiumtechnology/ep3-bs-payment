@@ -377,9 +377,6 @@ class BookingController extends AbstractActionController
                    }
                    #klarna checkout
 
-                   $this->flashMessenger()->addSuccessMessage(sprintf($this->t('%sPayment and Booking Succeed%s'),
-                       '<b>', '</b>'));
-
                    return $this->redirect()->toUrl($captureToken->getTargetUrl());
                    }
                 else {
@@ -567,6 +564,7 @@ class BookingController extends AbstractActionController
         // syslog(LOG_EMERG, 'doneAction');
         
         $serviceManager = $this->getServiceLocator();
+        $squareValidator = $serviceManager->get('Square\Service\SquareValidator');
         $bookingManager = $serviceManager->get('Booking\Manager\BookingManager');
         $squareManager = $serviceManager->get('Square\Manager\SquareManager');
 
