@@ -33,15 +33,28 @@ $this->setup(array(
         </style>
 
         <table class="default-table middle-table">
+            <tr> <!-- Add a row for column names -->
+                <td style="color: black;">Square</td>
+                <td style="color: black;">Date Start</td>
+                <td style="color: black;">Date End</td>
+                <td style="color: black;">Quantity</td>
+            </tr>
             <?php foreach ($this->cartItems as $cartItem): ?>
                 <tr>
-                    <td style="color: black;"><?= $cartItem['name'] ?></td>
-                    <td style="color: black;"><?= $cartItem['price'] ?></td>
+                    <td style="color: black;"><?= $cartItem['square'] ?></td>
+                    <td style="color: black;"><?= $cartItem['dateStart'] ?></td>
+                    <td style="color: black;"><?= $cartItem['dateEnd'] ?></td>
+                    <td style="color: black;"><?= $cartItem['quantity'] ?></td>
                 </tr>
             <?php endforeach; ?>
         </table>
 
         <div class="separator-small"></div>
+
+        <!-- Add the checkout button -->
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="/checkout" class="btn btn-primary">Checkout</a>
+        </div>
 
     <?php endif; ?>
 

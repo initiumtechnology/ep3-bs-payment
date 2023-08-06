@@ -12,7 +12,6 @@ class Cart
         // Private constructor to prevent direct instantiation
         // Initialize cartItems from the cookies
         if (isset($_COOKIE['cartItems'])) {
-            print_r("New Cookie");
             $cartItemsJson = $_COOKIE['cartItems'];
             $this->items = json_decode($cartItemsJson, true);
         } else {

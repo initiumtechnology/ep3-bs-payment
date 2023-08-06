@@ -21,6 +21,8 @@ class CartController extends AbstractActionController
             'cartItems' => $cartItems,
         ]);
 
+        print_r($cartItems);
+
         // Set the view template
         $viewModel->setTemplate('user/account/cart');
 
