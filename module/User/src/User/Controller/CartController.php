@@ -4,28 +4,19 @@ namespace User\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
+use \Square\Factory\Cart;
+
+use Zend\Session\Container;
 
 class CartController extends AbstractActionController
 {
     public function getAction()
     {
-        // Dummy array of cart items for testing
-        $cartItems = [
-            [
-                'id' => 1,
-                'name' => 'Item 1',
-                'price' => 10.99,
-                'quantity' => 2,
-            ],
-            [
-                'id' => 2,
-                'name' => 'Item 2',
-                'price' => 5.99,
-                'quantity' => 3,
-            ],
-            // Add more items as needed
-        ];
+        // Get current cart items stored in cookies
+        $cartService = Cart::getInstance();
+        $cartItems = $cartService->getItems();
 
+        // Return to view
         $viewModel = new ViewModel([
             'cartItems' => $cartItems,
         ]);
