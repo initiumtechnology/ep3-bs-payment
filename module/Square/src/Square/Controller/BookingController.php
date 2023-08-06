@@ -148,7 +148,7 @@ class BookingController extends AbstractActionController
 
             foreach ($playerNames as $playerName) {
                 if (strlen(trim($playerName['value'])) < 5 || strpos(trim($playerName['value']), ' ') === false) {
-                    throw new \RuntimeException('Die <b>vollständigen Vor- und Nachnamen</b> der anderen Spieler sind erforderlich');
+                    throw new \RuntimeException('Other players <b>full first and last names</b> are required');
                 }
             }
         } else {
@@ -158,9 +158,10 @@ class BookingController extends AbstractActionController
         // Store the booking details in the cart
         $cartService = Cart::getInstance();
 
+        // Change the following to booking info
         $cartService->addToCart([
             'id' => 4,
-            'name' => 'Item 4',
+            'name' => 'Item from Booking Controller',
             'price' => 11.99,
             'quantity' => 1,
         ]);
