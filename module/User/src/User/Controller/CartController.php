@@ -12,22 +12,11 @@ class CartController extends AbstractActionController
 {
     public function getAction()
     {
-
+        // Get current cart items stored in cookies
         $cartService = Cart::getInstance();
-
-        $cartService->addToCart([
-            'id' => 123,
-            'name' => 'Item 3',
-            'price' => 11.99,
-            'quantity' => 1,
-        ]);
-
         $cartItems = $cartService->getItems();
 
-        // Uncomment these lines for debugging
-        // print_r("CartController\n");
-        // print_r($cartItems);
-
+        // Return to view
         $viewModel = new ViewModel([
             'cartItems' => $cartItems,
         ]);
