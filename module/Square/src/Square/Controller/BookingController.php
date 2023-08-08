@@ -158,12 +158,33 @@ class BookingController extends AbstractActionController
         // Store the booking details in the cart
         $cartService = Cart::getInstance();
 
-        // Change the following to booking info
-        $cartService->addToCart([
+        // Define the booking info
+        $bookingInfo = [
             'square' => $square->get('name'),
             'dateStart' => $byproducts['dateStart']->format('Y-m-d H:i'),
             'dateEnd' => $byproducts['dateEnd']->format('Y-m-d H:i')
-        ]);
+        ];
+
+        // Check if the booking info already exists in the cart
+        $cartItems = $cartService->getItems();
+        $itemExists = false;
+
+        foreach ($cartItems as $cartItem) {
+            if ($cartItem['square'] === $bookingInfo['square'] &&
+                $cartItem['dateStart'] === $bookingInfo['dateStart'] &&
+                $cartItem['dateEnd'] === $bookingInfo['dateEnd']) {
+                $itemExists = true;
+                break;
+            }
+        }
+
+        if (!$itemExists) {
+            // Add the booking info to the cart only if it doesn't exist already
+            $cartService->addToCart($bookingInfo);
+        } else {
+            $this->flashMessenger()->addErrorMessage(sprintf($this->t('%sThis booking already exists in the cart!%s'),
+                       '<b>', '</b>'));
+        }
 
         return $this->redirect()->toRoute('user/cart');
     }
