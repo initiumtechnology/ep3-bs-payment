@@ -42,9 +42,9 @@ $this->setup(array(
             </tr>
             <?php foreach ($this->cartItems as $index => $cartItem): ?>
                 <tr>
-                    <td style="color: black;"><?= $cartItem['square'] ?></td>
-                    <td style="color: black;"><?= $cartItem['dateStart'] ?></td>
-                    <td style="color: black;"><?= $cartItem['dateEnd'] ?></td>
+                    <td style="color: black;"><?= $cartItem['squareName'] ?></td>
+                    <td style="color: black;"><?= substr($cartItem['dateStart'], 0, -3) ?></td>
+                    <td style="color: black;"><?= substr($cartItem['dateEnd'], 0, -3) ?></td>
                     <td style="color: black;">$<?= number_format($cartItem['price'], 2) ?></td>
                     <td>
                         <a href="<?php echo $this->url('user/cart/remove-item', array('index' => $index)); ?>" class="btn btn-danger btn-sm">

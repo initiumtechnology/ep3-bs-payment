@@ -16,9 +16,19 @@ class CartController extends AbstractActionController
         $cartService = Cart::getInstance();
         $cartItems = $cartService->getItems();
 
-        // TODO: Get price from cart service and add to each item
+        // Get the manager instances
+        $squareManager = $this->getServiceLocator()->get('Square\Manager\SquareManager');
+        $squarePricingManager = $this->getServiceLocator()->get('Square\Manager\SquarePricingManager');
+        
         foreach ($cartItems as &$cartItem) {
-            $cartItem['price'] = 10;
+            print_r($cartItem['square']);
+            $square = $squareManager->get($cartItem['square']);
+            $dateStart = $this->convertToDateTime($cartItem['dateStart']);
+            $dateEnd = $this->convertToDateTime($cartItem['dateEnd']);
+
+            $price = $squarePricingManager->getFinalPricingInRange($dateStart, $dateEnd, $square, 1, 0);
+            print_r($price);
+            $cartItem['price'] = $price['price']/100;
         }
 
         // Return to view
@@ -30,6 +40,14 @@ class CartController extends AbstractActionController
         $viewModel->setTemplate('user/account/cart');
 
         return $viewModel;
+    }
+
+    private function convertToDateTime($value)
+    {
+        if (is_string($value) && preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $value)) {
+            return \DateTime::createFromFormat('Y-m-d H:i:s', $value);
+        }
+        return $value;
     }
 
     public function removeItemAction()

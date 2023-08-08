@@ -160,17 +160,24 @@ class BookingController extends AbstractActionController
 
         // Define the booking info
         $bookingInfo = [
-            'square' => $square->get('name'),
-            'dateStart' => $byproducts['dateStart']->format('Y-m-d H:i'),
-            'dateEnd' => $byproducts['dateEnd']->format('Y-m-d H:i')
+            'square' => $squareParam,
+            'squareName' => $square->get('name'),
+            'dateStart' => $byproducts['dateStart']->format('Y-m-d H:i:s'),
+            'dateEnd' => $byproducts['dateEnd']->format('Y-m-d H:i:s')
         ];
+
+        // print_r($bookingInfo);
 
         // Check if the booking info already exists in the cart
         $cartItems = $cartService->getItems();
         $itemExists = false;
 
         foreach ($cartItems as $cartItem) {
-            if ($cartItem['square'] === $bookingInfo['square'] &&
+            print_r($cartItem['dateStart']);
+            print_r($bookingInfo['dateStart']);
+
+
+            if ($cartItem['squareName'] === $bookingInfo['squareName'] &&
                 $cartItem['dateStart'] === $bookingInfo['dateStart'] &&
                 $cartItem['dateEnd'] === $bookingInfo['dateEnd']) {
                 $itemExists = true;
