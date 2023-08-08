@@ -125,6 +125,21 @@ return array(
                                 'action' => 'get',
                             ),
                         ),
+                        'may_terminate' => true,
+                        'child_routes' => array(
+                            'remove-item' => array(
+                                'type' => 'Segment',
+                                'options' => array(
+                                    'route' => '/remove-item/:index',
+                                    'defaults' => array(
+                                        'action' => 'removeItem',
+                                    ),
+                                    'constraints' => array(
+                                        'index' => '\d+',
+                                    ),
+                                ),
+                            ),
+                        ),
                     ),
                     'settings' => array(
                         'type' => 'Literal',

@@ -40,4 +40,15 @@ class Cart
     {
         return $this->items;
     }
+
+    public function removeFromCart($index)
+    {
+        if (isset($this->items[$index])) {
+            unset($this->items[$index]);
+            // Save updated cartItems to the cookies
+            $cartItemsJson = json_encode($this->items);
+            setcookie('cartItems', $cartItemsJson, time() + (30 * 24 * 60 * 60), '/');
+        }
+    }
+
 }

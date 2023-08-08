@@ -10,7 +10,7 @@ $this->setup(array(
 ));
 
 ?>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 <div>
     <h1><?= $this->translate('Booking Cart') ?></h1>
 
@@ -35,21 +35,36 @@ $this->setup(array(
         <table class="default-table middle-table">
             <tr> <!-- Add a row for column names -->
                 <td style="color: black;">Square</td>
-                <td style="color: black;">Date Start</td>
-                <td style="color: black;">Date End</td>
-                <td style="color: black;">Quantity</td>
+                <td style="color: black;">Start Time</td>
+                <td style="color: black;">End Time</td>
+                <td style="color: black;">Price</td>
+                <td></td> <!-- Empty column for remove button -->
             </tr>
-            <?php foreach ($this->cartItems as $cartItem): ?>
+            <?php foreach ($this->cartItems as $index => $cartItem): ?>
                 <tr>
                     <td style="color: black;"><?= $cartItem['square'] ?></td>
                     <td style="color: black;"><?= $cartItem['dateStart'] ?></td>
                     <td style="color: black;"><?= $cartItem['dateEnd'] ?></td>
-                    <td style="color: black;"><?= $cartItem['quantity'] ?></td>
+                    <td style="color: black;">$<?= number_format($cartItem['price'], 2) ?></td>
+                    <td>
+                        <a href="<?php echo $this->url('user/cart/remove-item', array('index' => $index)); ?>" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash-alt"></i> Remove
+                        </a>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </table>
 
         <div class="separator-small"></div>
+
+        <!-- Calculate and display total price -->
+        <?php
+            $totalPrice = 0;
+            foreach ($this->cartItems as $cartItem) {
+                $totalPrice += $cartItem['price'];
+            }
+        ?>
+        <p style="text-align: right;">Total Price: $<?= number_format($totalPrice, 2) ?></p>
 
         <!-- Add the checkout button -->
         <div style="text-align: center; margin-top: 20px;">

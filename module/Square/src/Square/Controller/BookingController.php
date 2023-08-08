@@ -162,8 +162,7 @@ class BookingController extends AbstractActionController
         $cartService->addToCart([
             'square' => $square->get('name'),
             'dateStart' => $byproducts['dateStart']->format('Y-m-d H:i'),
-            'dateEnd' => $byproducts['dateEnd']->format('Y-m-d H:i'),
-            'quantity' => $byproducts['quantity']
+            'dateEnd' => $byproducts['dateEnd']->format('Y-m-d H:i')
         ]);
 
         return $this->redirect()->toRoute('user/cart');
