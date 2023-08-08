@@ -28,7 +28,7 @@ class CartController extends AbstractActionController
 
             $price = $squarePricingManager->getFinalPricingInRange($dateStart, $dateEnd, $square, 1, 0);
             print_r($price);
-            $cartItem['price'] = $price['price']/100;
+            $cartItem['price'] = $price['price'];
         }
 
         // Return to view

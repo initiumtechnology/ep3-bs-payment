@@ -176,7 +176,6 @@ class BookingController extends AbstractActionController
             print_r($cartItem['dateStart']);
             print_r($bookingInfo['dateStart']);
 
-
             if ($cartItem['squareName'] === $bookingInfo['squareName'] &&
                 $cartItem['dateStart'] === $bookingInfo['dateStart'] &&
                 $cartItem['dateEnd'] === $bookingInfo['dateEnd']) {

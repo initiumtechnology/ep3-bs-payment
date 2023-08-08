@@ -45,7 +45,7 @@ $this->setup(array(
                     <td style="color: black;"><?= $cartItem['squareName'] ?></td>
                     <td style="color: black;"><?= substr($cartItem['dateStart'], 0, -3) ?></td>
                     <td style="color: black;"><?= substr($cartItem['dateEnd'], 0, -3) ?></td>
-                    <td style="color: black;">$<?= number_format($cartItem['price'], 2) ?></td>
+                    <td style="color: black;">$<?= number_format($cartItem['price']/100, 2) ?></td>
                     <td>
                         <a href="<?php echo $this->url('user/cart/remove-item', array('index' => $index)); ?>" class="btn btn-danger btn-sm">
                             <i class="fas fa-trash-alt"></i> Remove
@@ -64,7 +64,7 @@ $this->setup(array(
                 $totalPrice += $cartItem['price'];
             }
         ?>
-        <p style="text-align: right;">Total Price: $<?= number_format($totalPrice, 2) ?></p>
+        <p style="text-align: right;">Total Price: $<?= number_format($totalPrice/100, 2) ?></p>
 
         <!-- Add the checkout button -->
         <div style="text-align: center; margin-top: 20px;">
