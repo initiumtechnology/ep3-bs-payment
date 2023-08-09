@@ -51,4 +51,14 @@ class Cart
         }
     }
 
+    public function setItems($items)
+    {
+        // Update the internal items array
+        $this->items = $items;
+
+        // Serialize and save cartItems to the cookies
+        $cartItemsJson = json_encode($this->items);
+        setcookie('cartItems', $cartItemsJson, time() + (30 * 24 * 60 * 60), '/');
+    }
+
 }

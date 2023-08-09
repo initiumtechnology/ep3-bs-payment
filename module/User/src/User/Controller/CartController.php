@@ -22,8 +22,8 @@ class CartController extends AbstractActionController
         
         foreach ($cartItems as &$cartItem) {
             $square = $squareManager->get($cartItem['square']);
-            $dateStart = $this->convertToDateTime($cartItem['dateStart']);
-            $dateEnd = $this->convertToDateTime($cartItem['dateEnd']);
+            $dateStart = $this->convertToDateTime($cartItem['start']);
+            $dateEnd = $this->convertToDateTime($cartItem['end']);
 
             $price = $squarePricingManager->getFinalPricingInRange($dateStart, $dateEnd, $square, 1, 0);
             $cartItem['squareName'] = $square->get('name');
@@ -51,7 +51,6 @@ class CartController extends AbstractActionController
 
     public function removeItemAction()
     {
-
         $index = $this->params()->fromRoute('index');
 
         // Get the cart service instance
