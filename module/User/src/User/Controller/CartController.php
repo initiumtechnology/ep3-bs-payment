@@ -21,13 +21,12 @@ class CartController extends AbstractActionController
         $squarePricingManager = $this->getServiceLocator()->get('Square\Manager\SquarePricingManager');
         
         foreach ($cartItems as &$cartItem) {
-            print_r($cartItem['square']);
             $square = $squareManager->get($cartItem['square']);
             $dateStart = $this->convertToDateTime($cartItem['dateStart']);
             $dateEnd = $this->convertToDateTime($cartItem['dateEnd']);
 
             $price = $squarePricingManager->getFinalPricingInRange($dateStart, $dateEnd, $square, 1, 0);
-            print_r($price);
+            $cartItem['squareName'] = $square->get('name');
             $cartItem['price'] = $price['price'];
         }
 

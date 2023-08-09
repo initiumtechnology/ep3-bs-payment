@@ -72,6 +72,7 @@ class BookingController extends AbstractActionController
         $byproducts = $squareValidator->isBookable($dateStartParam, $dateEndParam, $timeStartParam, $timeEndParam, $squareParam);
         $user = $byproducts['user'];
 
+        // Users need to login before adding bookings to cart
         if (! $user) {
             $query = $this->getRequest()->getUri()->getQueryAsArray();
             $query['ajax'] = 'false';
@@ -81,6 +82,7 @@ class BookingController extends AbstractActionController
             return $this->redirect()->toRoute('user/login');
         }
 
+        // No longer available
         if (! $byproducts['bookable']) {
             throw new RuntimeException(sprintf($this->t('This %s is already occupied'), $this->option('subject.square.type')));
         }
@@ -161,12 +163,9 @@ class BookingController extends AbstractActionController
         // Define the booking info
         $bookingInfo = [
             'square' => $squareParam,
-            'squareName' => $square->get('name'),
             'dateStart' => $byproducts['dateStart']->format('Y-m-d H:i:s'),
             'dateEnd' => $byproducts['dateEnd']->format('Y-m-d H:i:s')
         ];
-
-        // print_r($bookingInfo);
 
         // Check if the booking info already exists in the cart
         $cartItems = $cartService->getItems();
@@ -200,95 +199,6 @@ class BookingController extends AbstractActionController
         // Retrieve the booking details from the cart
         $cartService = $this->getServiceLocator()->get('Cart\Service\CartService');
         $byproducts = $cartService->getCart();
-
-        // Check if the user is logged in
-        $user = $byproducts['user'];
-
-        $query = $this->getRequest()->getUri()->getQueryAsArray();
-        $query['ajax'] = 'false';
-
-        if (! $user) {
-            $this->redirectBack()->setOrigin('square/booking/confirmation', [], ['query' => $query]);
-
-            return $this->redirect()->toRoute('user/login');
-        } else {
-            $byproducts['url'] = $this->url()->fromRoute('square/booking/confirmation', [], ['query' => $query]);
-        }
-
-        // Check if the booking is still available
-        if (! $byproducts['bookable']) {
-            throw new RuntimeException(sprintf($this->t('This %s is already occupied'), $this->option('subject.square.type')));
-        }
-
-        /* Check passed quantity */
-
-        if (! (is_numeric($quantityParam) && $quantityParam > 0)) {
-            throw new RuntimeException(sprintf($this->t('Invalid %s-amount choosen'), $this->option('subject.square.unit')));
-        }
-
-        $square = $byproducts['square'];
-
-        if ($square->need('capacity') - $byproducts['quantity'] < $quantityParam) {
-            throw new RuntimeException(sprintf($this->t('Too many %s for this %s choosen'), $this->option('subject.square.unit.plural'), $this->option('subject.square.type')));
-        }
-
-        $byproducts['quantityChoosen'] = $quantityParam;
-
-        /* Check passed products */
-
-        $products = array();
-
-        if (! ($productsParam === '0' || $productsParam === 0)) {
-            $productManager = $serviceManager->get('Square\Manager\SquareProductManager');
-            $productTuples = explode(',', $productsParam);
-
-            foreach ($productTuples as $productTuple) {
-                $productTupleParts = explode(':', $productTuple);
-
-                if (count($productTupleParts) != 2) {
-                    throw new RuntimeException('Malformed product parameter passed');
-                }
-
-                $spid = $productTupleParts[0];
-                $amount = $productTupleParts[1];
-
-                if (! (is_numeric($spid) && $spid > 0)) {
-                    throw new RuntimeException('Malformed product parameter passed');
-                }
-
-                if (! is_numeric($amount)) {
-                    throw new RuntimeException('Malformed product parameter passed');
-                }
-
-                $product = $productManager->get($spid);
-
-                $productOptions = explode(',', $product->need('options'));
-
-                if (! in_array($amount, $productOptions)) {
-                    throw new RuntimeException('Malformed product parameter passed');
-                }
-
-                $product->setExtra('amount', $amount);
-
-                $products[$spid] = $product;
-            }
-        }
-
-        $byproducts['products'] = $products;
-
-        /* Check passed player names */
-
-        if ($playerNamesParam) {
-            $playerNames = Json::decode($playerNamesParam, Json::TYPE_ARRAY);
-
-            foreach ($playerNames as $playerName) {
-                if (strlen(trim($playerName['value'])) < 5 || strpos(trim($playerName['value']), ' ') === false) {
-                    throw new \RuntimeException('Die <b>vollständigen Vor- und Nachnamen</b> der anderen Spieler sind erforderlich');
-                }
-            }
-        } else {
-            $playerNames = null;
-        }
 
         /* display payment checkout */
         if ($this->config('paypal') != null && $this->config('paypal') == true) {  
