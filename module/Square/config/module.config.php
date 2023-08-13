@@ -42,6 +42,15 @@ return array(
                                     ),
                                 ),
                             ),
+                            'checkout' => array(
+                                'type' => 'Literal',
+                                'options' => array(
+                                    'route' => '/checkout',
+                                    'defaults' => array(
+                                        'action' => 'checkout',
+                                    ),
+                                ),
+                            ),
                             'confirmation' => array(
                                 'type' => 'Literal',
                                 'options' => array(
