@@ -217,10 +217,11 @@ class BookingController extends AbstractActionController
         $total = 0;
 
         // Check if each square still available
+        $serviceManager = $this->getServiceLocator();
         $squareValidator = $serviceManager->get('Square\Service\SquareValidator');
         $squarePricingManager = $serviceManager->get('Square\Manager\SquarePricingManager');
         foreach ($cartItems as &$cartItem) {
-            $byproducts = $squareValidator->isBookable($cartItems['dateStart'], $cartItems['dateEnd'], $cartItems['timeStart'], $cartItems['timeEnd'], $cartItems['square']);
+            $byproducts = $squareValidator->isBookable($cartItem['dateStart'], $cartItem['dateEnd'], $cartItem['timeStart'], $cartItem['timeEnd'], $cartItem['square']);
             
             // If the booking is no longer available
             if (! $byproducts['bookable']) {
@@ -240,6 +241,8 @@ class BookingController extends AbstractActionController
             $finalPrice = $squarePricingManager->getFinalPricingInRange($dateStart, $dateEnd, $square, 1, $member);
             $total += $finalPrice['price'];
         }
+
+        print_r($total);
 
         // If not all available, warn user and refresh cart
         if(! $allAvailable) {
