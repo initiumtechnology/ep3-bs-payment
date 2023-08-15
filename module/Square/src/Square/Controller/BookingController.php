@@ -367,8 +367,6 @@ class BookingController extends AbstractActionController
                 $bookings[] = array('b' => $bookingService->createSingle($user, $square, 1, $byproducts['dateStart'], $byproducts['dateEnd'], $bills, $meta),
                                     'p' => $cartItem['price']);
             }
-
-            print_r($bookings);
             
             /* Go to payment */
             if (($payservice == 'paypal' || $payservice == 'stripe' || $payservice == 'klarna') && $payable) {
@@ -449,10 +447,14 @@ class BookingController extends AbstractActionController
                    return $this->redirect()->toUrl($captureToken->getTargetUrl());
                    }
                 else {
-        //            $bookingService->cancelSingle($booking);
-        //            $this->flashMessenger()->addErrorMessage(sprintf($this->t('%sSorry online booking not possible at the moment!%s'),
-        //                '<b>', '</b>'));
-        //            return $this->redirectBack()->toOrigin();  
+                   // Cancel all bookings
+                   foreach ($bookings as &$tuple) {
+                        $booking = $tuple['b'];
+                        $bookingService->cancelSingle($booking);
+                   }
+                   $this->flashMessenger()->addErrorMessage(sprintf($this->t('%sSorry online booking not possible at the moment!%s'),
+                       '<b>', '</b>'));
+                   return $this->redirectBack()->toOrigin();  
                 }    
                 # payment checkout
             } else {
@@ -500,7 +502,6 @@ class BookingController extends AbstractActionController
                 return $this->redirectBack()->toOrigin();
             }                
           }     
-
         }
     //    return $this->ajaxViewModel($byproducts);
     }
