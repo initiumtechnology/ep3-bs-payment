@@ -256,28 +256,9 @@ class BookingController extends AbstractActionController
         }
         
         $payable = false;
-        $bills = array();
 
-        // /* display payment checkout */
-        // if ($this->config('paypal') != null && $this->config('paypal') == true) {  
-        //     $byproducts['paypal'] = true;
-        // }
-        // if ($this->config('stripe') != null && $this->config('stripe') == true) {
-        //     $byproducts['stripe'] = true;
-        //     $byproducts['stripePaymentMethods'] = $this->config('stripePaymentMethods');
-        //     $byproducts['stripeIcon'] = $this->config('stripeIcon');
-
-        // }
-        // if ($this->config('klarna') != null && $this->config('klarna') == true) {
-        //     $byproducts['klarna'] = true;
-        // }
-        // if ($this->config('billing') != null && $this->config('billing') == true) {
-        //     $byproducts['billing'] = true;
-        // }
-        // if ($this->config('payment_default') != null) {
-        //     $byproducts['payment_default'] = $this->config('payment_default');
-        // }
-
+        // // billing for products??? (need to check later)
+        // $bills = array();
         // foreach ($products as $product) {
 
         //     $bills[] = new Bill(array(
@@ -291,234 +272,242 @@ class BookingController extends AbstractActionController
         //     $total+=$product->need('price') * $product->needExtra('amount');
         // }
 
-    //     $newbudget = 0;
-    //     $byproducts['hasBudget'] = false; 
-    //     $budgetpayment = false;
+        $newbudget = 0;
+        $byproducts['hasBudget'] = false; 
+        $budgetpayment = false;
 
-    //     // calculate end total from user budget
-    //     if ($user != null && $user->getMeta('budget') != null && $user->getMeta('budget') > 0 && $total > 0) {
-    //         $byproducts['hasBudget'] = true;
-    //         $budget = $user->getMeta('budget');
-    //         $byproducts['budget'] = $budget;
-    //         // syslog(LOG_EMERG, 'budget: ' . $budget);
-    //         $newtotal = $total - ($budget*100);
-    //         if ($newtotal <= 0) {
-    //             $budgetpayment = true;
-    //         }
-    //         $byproducts['newtotal'] = $newtotal;
-    //         // syslog(LOG_EMERG, 'newtotal: ' . $newtotal);
-    //         $newbudget = ($budget*100-$total)/100;
-    //         if ($newbudget < 0) { 
-    //             $newbudget = 0;
-    //         }
-    //         $byproducts['newbudget'] = $newbudget;
-    //         // syslog(LOG_EMERG, 'newbudget: ' . $newbudget);
+        // calculate end total from user budget
+        if ($user != null && $user->getMeta('budget') != null && $user->getMeta('budget') > 0 && $total > 0) {
+            // Get user budget (credit)
+            $byproducts['hasBudget'] = true;
+            $budget = $user->getMeta('budget');
+            $byproducts['budget'] = $budget;
 
-    //         $total = $newtotal;
-    //     }
+            // Calculate new total payable
+            $newtotal = $total - ($budget*100);
+            if ($newtotal <= 0) {
+                $budgetpayment = true;
+            }
+            $byproducts['newtotal'] = $newtotal;
 
-    //     if ($total > 0 ) {
-    //         $payable = true;
-    //     }
+            // Calculate new budget
+            $newbudget = ($budget*100-$total)/100;
+            if ($newbudget < 0) { 
+                $newbudget = 0;
+            }
+            $byproducts['newbudget'] = $newbudget;
 
-    //     $byproducts['payable'] = $payable;
+            $total = $newtotal;
+        }
 
-    //     /* Check booking form submission */
+        // Check if there are remaining amounts payable
+        if ($total > 0 ) {
+            $payable = true;
+        }
+        $byproducts['payable'] = $payable;
 
-    //     $acceptRulesDocument = $this->params()->fromPost('bf-accept-rules-document');
-    //     $acceptRulesText = $this->params()->fromPost('bf-accept-rules-text');
-    //     $confirmationHash = $this->params()->fromPost('bf-confirm');
-    //     $confirmationHashOriginal = sha1('Quick and dirty' . floor(time() / 1800));
 
-    //     if ($confirmationHash) {
 
-    //         if ($square->getMeta('rules.document.file') && $acceptRulesDocument != 'on') {
-    //             $byproducts['message'] = sprintf($this->t('%sNote:%s Please read and accept the "%s".'),
-    //                 '<b>', '</b>', $square->getMeta('rules.document.name', 'Rules-document'));
-    //         }
+        /* Check booking form submission */
 
-    //         if ($square->getMeta('rules.text') && $acceptRulesText != 'on') {
-    //             $byproducts['message'] = sprintf($this->t('%sNote:%s Please read and accept our rules and notes.'),
-    //                 '<b>', '</b>');
-    //         }
+        // $acceptRulesDocument = $this->params()->fromPost('bf-accept-rules-document');
+        // $acceptRulesText = $this->params()->fromPost('bf-accept-rules-text');
+        $acceptRulesDocument = 'on';
+        $acceptRulesText = 'on';
+        $confirmationHash = sha1('Quick and dirty' . floor(time() / 1800));
+        $confirmationHashOriginal = sha1('Quick and dirty' . floor(time() / 1800));
 
-    //         if ($confirmationHash != $confirmationHashOriginal) {
-    //             $byproducts['message'] = sprintf($this->t('%We are sorry:%s This did not work somehow. Please try again.'),
-    //                 '<b>', '</b>');
-    //         }
+        if ($confirmationHash) {
 
-    //       if (! isset($byproducts['message'])) {
+            // Check if users accepted the terms
 
-    //         $bookingService = $serviceManager->get('Booking\Service\BookingService');
-    //         $bookingManager = $serviceManager->get('Booking\Manager\BookingManager');
+            // if ($square->getMeta('rules.document.file') && $acceptRulesDocument != 'on') {
+            //     $byproducts['message'] = sprintf($this->t('%sNote:%s Please read and accept the "%s".'),
+            //         '<b>', '</b>', $square->getMeta('rules.document.name', 'Rules-document'));
+            // }
 
-    //         $notes = ''; 
+            // if ($square->getMeta('rules.text') && $acceptRulesText != 'on') {
+            //     $byproducts['message'] = sprintf($this->t('%sNote:%s Please read and accept our rules and notes.'),
+            //         '<b>', '</b>');
+            // }
 
-    //         if ($square->get('allow_notes') && $this->params()->fromPost('bf-user-notes') != null && $this->params()->fromPost('bf-user-notes') != '') {
-    //             $notes = "Anmerkungen des Benutzers:\n" . $this->params()->fromPost('bf-user-notes') . " || ";
-    //         } 
+            // if ($confirmationHash != $confirmationHashOriginal) {
+            //     $byproducts['message'] = sprintf($this->t('%We are sorry:%s This did not work somehow. Please try again.'),
+            //         '<b>', '</b>');
+            // }
 
-    //         $payservice = $this->params()->fromPost('paymentservice');
-    //         $meta = array('player-names' => serialize($playerNames), 'notes' => $notes); 
+        //   if (! isset($byproducts['message'])) {
+
+        //     $bookingService = $serviceManager->get('Booking\Service\BookingService');
+        //     $bookingManager = $serviceManager->get('Booking\Manager\BookingManager');
+
+        //     $notes = ''; 
+
+        //     if ($square->get('allow_notes') && $this->params()->fromPost('bf-user-notes') != null && $this->params()->fromPost('bf-user-notes') != '') {
+        //         $notes = "Anmerkungen des Benutzers:\n" . $this->params()->fromPost('bf-user-notes') . " || ";
+        //     } 
+
+        //     $payservice = $this->params()->fromPost('paymentservice');
+        //     $meta = array('player-names' => serialize($playerNames), 'notes' => $notes); 
             
-    //         if (($payservice == 'paypal' || $payservice == 'stripe' || $payservice == 'klarna') && $payable) {
-    //                $meta['directpay'] = 'true';
-    //         }
+        //     if (($payservice == 'paypal' || $payservice == 'stripe' || $payservice == 'klarna') && $payable) {
+        //            $meta['directpay'] = 'true';
+        //     }
 
-    //         $booking = $bookingService->createSingle($user, $square, $quantityParam, $byproducts['dateStart'], $byproducts['dateEnd'], $bills, $meta);
+        //     $booking = $bookingService->createSingle($user, $square, $quantityParam, $byproducts['dateStart'], $byproducts['dateEnd'], $bills, $meta);
             
-    //         if (($payservice == 'paypal' || $payservice == 'stripe' || $payservice == 'klarna') && $payable) {
-    //         # payment checkout
-    //             if($payable) {
-    //                // $paymentService = $serviceManager->get('Payment\Service\PaymentService'); 
-    //                // $paymentService->initBookingPayment($booking, $user, $payservice, $total, $byproducts); 
+        //     if (($payservice == 'paypal' || $payservice == 'stripe' || $payservice == 'klarna') && $payable) {
+        //     # payment checkout
+        //         if($payable) {
+        //            // $paymentService = $serviceManager->get('Payment\Service\PaymentService'); 
+        //            // $paymentService->initBookingPayment($booking, $user, $payservice, $total, $byproducts); 
                     
-    //                $basepath = $this->config('basepath');
-    //                if (isset($basepath) && $basepath != '' && $basepath != ' ') {
-    //                    $basepath = '/'.$basepath;  
-    //                } 
-    //                $projectShort = $this->option('client.name.short');
-    //                $baseurl = $this->config('baseurl');
-    //                $proxyurl = $this->config('proxyurl');
-	// 	           $storage = $this->getServiceLocator()->get('payum')->getStorage('Application\Model\PaymentDetails');
-    //                $tokenStorage = $this->getServiceLocator()->get('payum.options')->getTokenStorage(); 
-    //                $captureToken = null;
-    //                $model = $storage->create();
-    //                $booking->setMeta('paymentMethod', $payservice);
-    //                $booking->setMeta('hasBudget', $byproducts['hasBudget']);
-    //                $booking->setMeta('newbudget', $byproducts['newbudget']);
-    //                $booking->setMeta('budget', $byproducts['budget']); 
-    //                $bookingManager->save($booking);
-    //                $userName = $user->getMeta('firstname') . ' ' . $user->getMeta('lastname');
-    //                $companyName = $this->option('client.name.full');
+        //            $basepath = $this->config('basepath');
+        //            if (isset($basepath) && $basepath != '' && $basepath != ' ') {
+        //                $basepath = '/'.$basepath;  
+        //            } 
+        //            $projectShort = $this->option('client.name.short');
+        //            $baseurl = $this->config('baseurl');
+        //            $proxyurl = $this->config('proxyurl');
+		//            $storage = $this->getServiceLocator()->get('payum')->getStorage('Application\Model\PaymentDetails');
+        //            $tokenStorage = $this->getServiceLocator()->get('payum.options')->getTokenStorage(); 
+        //            $captureToken = null;
+        //            $model = $storage->create();
+        //            $booking->setMeta('paymentMethod', $payservice);
+        //            $booking->setMeta('hasBudget', $byproducts['hasBudget']);
+        //            $booking->setMeta('newbudget', $byproducts['newbudget']);
+        //            $booking->setMeta('budget', $byproducts['budget']); 
+        //            $bookingManager->save($booking);
+        //            $userName = $user->getMeta('firstname') . ' ' . $user->getMeta('lastname');
+        //            $companyName = $this->option('client.name.full');
 
-    //                $locale = $this->config('i18n.locale');
+        //            $locale = $this->config('i18n.locale');
 
-    //                $description = $projectShort.' booking-'.$booking->get('bid');
-    //                if (isset($locale) && ($locale == 'de-DE' || $locale == 'de_DE')) {
-    //                     $description = $projectShort.' Buchung-'.$booking->get('bid');
-    //                }
+        //            $description = $projectShort.' booking-'.$booking->get('bid');
+        //            if (isset($locale) && ($locale == 'de-DE' || $locale == 'de_DE')) {
+        //                 $description = $projectShort.' Buchung-'.$booking->get('bid');
+        //            }
 
-    //                #paypal checkout            
-    //                if ($payservice == 'paypal') {
-    // 		           $model['PAYMENTREQUEST_0_CURRENCYCODE'] = 'EUR';
-    // 		           $model['PAYMENTREQUEST_0_AMT'] = $total/100;
-    //                    $model['PAYMENTREQUEST_0_BID'] = $booking->get('bid');
-    //                    $model['PAYMENTREQUEST_0_DESC'] = $description;
-    //                    $model['PAYMENTREQUEST_0_EMAIL'] = $user->get('email');
-    //                    $storage->update($model);
-    //  		           $captureToken = $this->getServiceLocator()->get('payum.security.token_factory')->createCaptureToken(
-    //                        'paypal_ec', $model, $proxyurl.$basepath.'/square/booking/payment/done');
-    //                }				    
-    //                #paypal checkout
-    //                #stripe checkout
-    //                if ($payservice == 'stripe') {
-    //                    $model["payment_method_types"] = $this->config('stripePaymentMethods');                       
-    //                    // nur zusammen mit stripe customer objekt
-    //                    // $model["payment_method_options"] = $this->config('stripePaymentMethodOptions');
+        //            #paypal checkout            
+        //            if ($payservice == 'paypal') {
+    	// 	           $model['PAYMENTREQUEST_0_CURRENCYCODE'] = 'EUR';
+    	// 	           $model['PAYMENTREQUEST_0_AMT'] = $total/100;
+        //                $model['PAYMENTREQUEST_0_BID'] = $booking->get('bid');
+        //                $model['PAYMENTREQUEST_0_DESC'] = $description;
+        //                $model['PAYMENTREQUEST_0_EMAIL'] = $user->get('email');
+        //                $storage->update($model);
+     	// 	           $captureToken = $this->getServiceLocator()->get('payum.security.token_factory')->createCaptureToken(
+        //                    'paypal_ec', $model, $proxyurl.$basepath.'/square/booking/payment/done');
+        //            }				    
+        //            #paypal checkout
+        //            #stripe checkout
+        //            if ($payservice == 'stripe') {
+        //                $model["payment_method_types"] = $this->config('stripePaymentMethods');                       
+        //                // nur zusammen mit stripe customer objekt
+        //                // $model["payment_method_options"] = $this->config('stripePaymentMethodOptions');
                        
-    //                    $model["amount"] = $total;
-    //                    $model["currency"] = 'AUD';
-    //                    $model["description"] = $description;
-    //                    $model["receipt_email"] = $user->get('email');
-    //                    $model["metadata"] = array('bid' => $booking->get('bid'), 'productName' => $this->option('subject.type'), 'locale' => $locale, 'instance' => $basepath, 'projectShort' => $projectShort, 'userName' => $userName, 'companyName' => $companyName, 'stripeDefaultPaymentMethod' => $this->config('stripeDefaultPaymentMethod'), 'stripeAutoConfirm' => var_export($this->config('stripeAutoConfirm'), true), 'stripePaymentRequest' => var_export($this->config('stripePaymentRequest'), true));
-    //                    $storage->update($model);
-    //                    $captureToken = $this->getServiceLocator()->get('payum.security.token_factory')->createCaptureToken(
-    //                        'stripe', $model, $proxyurl.$basepath.'/square/booking/payment/confirm');
-    //                }
-    //                #stripe checkout
-    //                #klarna checkout
-    //                if ($payservice == 'klarna') {
-    //                    $model['purchase_country'] = 'DE';
-    //                    $model['purchase_currency'] = 'EUR';
-    //                    $model['locale'] = 'de-DE';
-    //                    $storage->update($model); 
-    //                    $captureToken = $this->getServiceLocator()->get('payum.security.token_factory')->createAuthorizeToken('klarna_checkout', $model, $proxyurl.$basepath.'/square/booking/payment/done');
-    //                    $notifyToken = $this->getServiceLocator()->get('payum.security.token_factory')->createNotifyToken('klarna_checkout', $model);
-    //                }
-    //                #klarna checkout
+        //                $model["amount"] = $total;
+        //                $model["currency"] = 'AUD';
+        //                $model["description"] = $description;
+        //                $model["receipt_email"] = $user->get('email');
+        //                $model["metadata"] = array('bid' => $booking->get('bid'), 'productName' => $this->option('subject.type'), 'locale' => $locale, 'instance' => $basepath, 'projectShort' => $projectShort, 'userName' => $userName, 'companyName' => $companyName, 'stripeDefaultPaymentMethod' => $this->config('stripeDefaultPaymentMethod'), 'stripeAutoConfirm' => var_export($this->config('stripeAutoConfirm'), true), 'stripePaymentRequest' => var_export($this->config('stripePaymentRequest'), true));
+        //                $storage->update($model);
+        //                $captureToken = $this->getServiceLocator()->get('payum.security.token_factory')->createCaptureToken(
+        //                    'stripe', $model, $proxyurl.$basepath.'/square/booking/payment/confirm');
+        //            }
+        //            #stripe checkout
+        //            #klarna checkout
+        //            if ($payservice == 'klarna') {
+        //                $model['purchase_country'] = 'DE';
+        //                $model['purchase_currency'] = 'EUR';
+        //                $model['locale'] = 'de-DE';
+        //                $storage->update($model); 
+        //                $captureToken = $this->getServiceLocator()->get('payum.security.token_factory')->createAuthorizeToken('klarna_checkout', $model, $proxyurl.$basepath.'/square/booking/payment/done');
+        //                $notifyToken = $this->getServiceLocator()->get('payum.security.token_factory')->createNotifyToken('klarna_checkout', $model);
+        //            }
+        //            #klarna checkout
                    
-    //                $targetUrl = str_replace($baseurl, $proxyurl, $captureToken->getTargetUrl());
-    //                $captureToken->setTargetUrl($targetUrl);
-    //                $tokenStorage->update($captureToken);
+        //            $targetUrl = str_replace($baseurl, $proxyurl, $captureToken->getTargetUrl());
+        //            $captureToken->setTargetUrl($targetUrl);
+        //            $tokenStorage->update($captureToken);
 
-    //                #klarna checkout update merchant details
-    //                if ($payservice == 'klarna') {
-    //                    $model['merchant'] = array(
-    //                        'terms_uri' => 'http://example.com/terms',
-    //                        'checkout_uri' => $captureToken->getTargetUrl(),
-    //                        'confirmation_uri' => $captureToken->getTargetUrl(),
-    //                        'push_uri' => $notifyToken->getTargetUrl()
-    //                    );
-    //                    $model['cart'] = array(
-    //                        'items' => array(
-    //                             array(
-    //                                'reference' => $booking->get('bid'),
-    //                                'name' => $description,
-    //                                'quantity' => 1,
-    //                                'unit_price' => $total,
-    //                             )
-    //                        )
-    //                    );
-    //                    $storage->update($model);
-    //                }
-    //                #klarna checkout
+        //            #klarna checkout update merchant details
+        //            if ($payservice == 'klarna') {
+        //                $model['merchant'] = array(
+        //                    'terms_uri' => 'http://example.com/terms',
+        //                    'checkout_uri' => $captureToken->getTargetUrl(),
+        //                    'confirmation_uri' => $captureToken->getTargetUrl(),
+        //                    'push_uri' => $notifyToken->getTargetUrl()
+        //                );
+        //                $model['cart'] = array(
+        //                    'items' => array(
+        //                         array(
+        //                            'reference' => $booking->get('bid'),
+        //                            'name' => $description,
+        //                            'quantity' => 1,
+        //                            'unit_price' => $total,
+        //                         )
+        //                    )
+        //                );
+        //                $storage->update($model);
+        //            }
+        //            #klarna checkout
 
-    //                $this->flashMessenger()->addSuccessMessage(sprintf($this->t('%sPayment and Booking Succeed%s'),
-    //                    '<b>', '</b>'));
+        //            $this->flashMessenger()->addSuccessMessage(sprintf($this->t('%sPayment and Booking Succeed%s'),
+        //                '<b>', '</b>'));
 
-    //                return $this->redirect()->toUrl($captureToken->getTargetUrl());
-    //                }
-    //             else {
-    //                $bookingService->cancelSingle($booking);
-    //                $this->flashMessenger()->addErrorMessage(sprintf($this->t('%sSorry online booking not possible at the moment!%s'),
-    //                    '<b>', '</b>'));
-    //                return $this->redirectBack()->toOrigin();  
-    //             }    
-    //             # payment checkout
-    //         } else {
-    //             # no paymentservice
+        //            return $this->redirect()->toUrl($captureToken->getTargetUrl());
+        //            }
+        //         else {
+        //            $bookingService->cancelSingle($booking);
+        //            $this->flashMessenger()->addErrorMessage(sprintf($this->t('%sSorry online booking not possible at the moment!%s'),
+        //                '<b>', '</b>'));
+        //            return $this->redirectBack()->toOrigin();  
+        //         }    
+        //         # payment checkout
+        //     } else {
+        //         # no paymentservice
                
-    //             # redefine user budget
-    //             if ($budgetpayment) { 
-    //                 $userManager = $serviceManager->get('User\Manager\UserManager');
-    //                 $user->setMeta('budget', $newbudget);
-    //                 $userManager->save($user);
-    //                 $booking->setMeta('budget', $budget);
-    //                 $booking->setMeta('newbudget', $newbudget);
-    //                 # set booking to paid  
-    //                 $booking->set('status_billing', 'paid');
-    //                 $notes = $notes . " payment with user budget";
-    //                 $booking->setMeta('notes', $notes);
-    //                 $bookingManager->save($booking);                   
-    //             }
+        //         # redefine user budget
+        //         if ($budgetpayment) { 
+        //             $userManager = $serviceManager->get('User\Manager\UserManager');
+        //             $user->setMeta('budget', $newbudget);
+        //             $userManager->save($user);
+        //             $booking->setMeta('budget', $budget);
+        //             $booking->setMeta('newbudget', $newbudget);
+        //             # set booking to paid  
+        //             $booking->set('status_billing', 'paid');
+        //             $notes = $notes . " payment with user budget";
+        //             $booking->setMeta('notes', $notes);
+        //             $bookingManager->save($booking);                   
+        //         }
                 
-    //             if ($this->config('genDoorCode') != null && $this->config('genDoorCode') == true && $square->getMeta('square_control') == true) {
-    //                 $doorCode = $booking->getMeta('doorCode');
-    //                 $squareControlService = $serviceManager->get('SquareControl\Service\SquareControlService');
-    //                 if ($squareControlService->createDoorCode($booking->need('bid'), $doorCode) == true) {
-    //                     $this->flashMessenger()->addSuccessMessage(sprintf($this->t('Your %s has been booked! The doorcode is: %s'),
-    //                         $this->option('subject.square.type'), $doorCode));
-    //                 } else {
-    //                     $this->flashMessenger()->addErrorMessage(sprintf($this->t('Your %s has been booked! But the doorcode could not be send. Please contact admin by phone - %s'),
-    //                         $this->option('subject.square.type'), $this->option('client.contact.phone')));
-    //                 }
-    //             }
-    //             else{
-    //                 $this->flashMessenger()->addSuccessMessage(sprintf($this->t('%sCongratulations:%s Your %s has been booked!'),
-    //                     '<b>', '</b>',$this->option('subject.square.type')));
-    //             }  
+        //         if ($this->config('genDoorCode') != null && $this->config('genDoorCode') == true && $square->getMeta('square_control') == true) {
+        //             $doorCode = $booking->getMeta('doorCode');
+        //             $squareControlService = $serviceManager->get('SquareControl\Service\SquareControlService');
+        //             if ($squareControlService->createDoorCode($booking->need('bid'), $doorCode) == true) {
+        //                 $this->flashMessenger()->addSuccessMessage(sprintf($this->t('Your %s has been booked! The doorcode is: %s'),
+        //                     $this->option('subject.square.type'), $doorCode));
+        //             } else {
+        //                 $this->flashMessenger()->addErrorMessage(sprintf($this->t('Your %s has been booked! But the doorcode could not be send. Please contact admin by phone - %s'),
+        //                     $this->option('subject.square.type'), $this->option('client.contact.phone')));
+        //             }
+        //         }
+        //         else{
+        //             $this->flashMessenger()->addSuccessMessage(sprintf($this->t('%sCongratulations:%s Your %s has been booked!'),
+        //                 '<b>', '</b>',$this->option('subject.square.type')));
+        //         }  
 
-    //             if ($this->config('tmpBookingAt') != null) {    
-    //                 $this->flashMessenger()->addSuccessMessage(sprintf($this->t('%sPayment and admittance temporarily at %s!%s'),
-    //                     '<b>', $this->config('tmpBookingAt'), '</b>'));
-    //             }
+        //         if ($this->config('tmpBookingAt') != null) {    
+        //             $this->flashMessenger()->addSuccessMessage(sprintf($this->t('%sPayment and admittance temporarily at %s!%s'),
+        //                 '<b>', $this->config('tmpBookingAt'), '</b>'));
+        //         }
 
-    //             return $this->redirectBack()->toOrigin();
-    //         }                
-    //       }               
-    //     }
+        //         return $this->redirectBack()->toOrigin();
+        //     }                
+        //   }     
 
+        }
     //    return $this->ajaxViewModel($byproducts);
     }
 
