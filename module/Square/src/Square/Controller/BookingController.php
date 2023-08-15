@@ -18,6 +18,7 @@ use Payum\Stripe\Request\Confirm;
 use Stripe;
 use GuzzleHttp\Client; 
 use \Square\Factory\Cart;
+use User\Manager\UserSessionManager;
 
 
 class BookingController extends AbstractActionController
@@ -197,18 +198,28 @@ class BookingController extends AbstractActionController
 
     public function checkoutAction()
     {
-        // Retrieve the booking details from the cart
-        $cartService = Cart::getInstance();
-        $cartItems = $cartService->getItems();
+        $serviceManager = $this->getServiceLocator();
+
+        // Check user info
+        $userSessionManager = $serviceManager->get('User\Manager\UserSessionManager');
+        $user = $userSessionManager->getSessionUser();
 
         // Users need to login before checkout
         if (! $user) {
             $query = $this->getRequest()->getUri()->getQueryAsArray();
             $query['ajax'] = 'false';
-
             $this->redirectBack()->setOrigin('square/booking/checkout');
-
             return $this->redirect()->toRoute('user/login');
+        }
+
+        // Retrieve the booking details from the cart
+        $cartService = Cart::getInstance();
+        $cartItems = $cartService->getItems();
+
+        // Check if the user is a member
+        $member = 0;
+        if ($user != null && $user->getMeta('member') != null) {
+           $member = $user->getMeta('member');
         }
 
         // Create an array to store items that are still available
@@ -217,7 +228,6 @@ class BookingController extends AbstractActionController
         $total = 0;
 
         // Check if each square still available
-        $serviceManager = $this->getServiceLocator();
         $squareValidator = $serviceManager->get('Square\Service\SquareValidator');
         $squarePricingManager = $serviceManager->get('Square\Manager\SquarePricingManager');
         foreach ($cartItems as &$cartItem) {
@@ -233,16 +243,10 @@ class BookingController extends AbstractActionController
                 $updatedCartItems[] = $cartItem;
             }
 
-            // Calculate total price
-            $square = $squareManager->get($cartItem['square']);
-            $user = $byproducts['user'];
-            $dateStart = $this->convertToDateTime($cartItem['start']);
-            $dateEnd = $this->convertToDateTime($cartItem['end']);
-            $finalPrice = $squarePricingManager->getFinalPricingInRange($dateStart, $dateEnd, $square, 1, $member);
+            // Get square and user info
+            $finalPrice = $squarePricingManager->getFinalPricingInRange($byproducts['dateStart'], $byproducts['dateEnd'], $byproducts['square'], 1, $member);
             $total += $finalPrice['price'];
         }
-
-        print_r($total);
 
         // If not all available, warn user and refresh cart
         if(! $allAvailable) {
@@ -253,12 +257,6 @@ class BookingController extends AbstractActionController
             return $this->redirect()->toRoute('user/cart');
         }
         
-        // Check if the user is a member
-        $member = 0;
-        if ($user != null && $user->getMeta('member') != null) {
-           $member = $user->getMeta('member');
-        }
-
         $payable = false;
         $bills = array();
 
