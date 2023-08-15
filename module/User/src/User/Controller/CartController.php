@@ -16,6 +16,16 @@ class CartController extends AbstractActionController
         $cartService = Cart::getInstance();
         $cartItems = $cartService->getItems();
 
+        // Check user info
+        $userSessionManager = $this->getServiceLocator()->get('User\Manager\UserSessionManager');
+        $user = $userSessionManager->getSessionUser();
+
+        // Check if the user is a member
+        $member = 0;
+        if ($user != null && $user->getMeta('member') != null) {
+           $member = $user->getMeta('member');
+        }
+
         // Get the manager instances
         $squareManager = $this->getServiceLocator()->get('Square\Manager\SquareManager');
         $squarePricingManager = $this->getServiceLocator()->get('Square\Manager\SquarePricingManager');
@@ -25,7 +35,7 @@ class CartController extends AbstractActionController
             $dateStart = $this->convertToDateTime($cartItem['start']);
             $dateEnd = $this->convertToDateTime($cartItem['end']);
 
-            $price = $squarePricingManager->getFinalPricingInRange($dateStart, $dateEnd, $square, 1, 0);
+            $price = $squarePricingManager->getFinalPricingInRange($dateStart, $dateEnd, $square, 1, $member);
             $cartItem['squareName'] = $square->get('name');
             $cartItem['price'] = $price['price'];
         }

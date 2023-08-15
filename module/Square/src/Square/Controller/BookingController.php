@@ -18,8 +18,6 @@ use Payum\Stripe\Request\Confirm;
 use Stripe;
 use GuzzleHttp\Client; 
 use \Square\Factory\Cart;
-use User\Manager\UserSessionManager;
-
 
 class BookingController extends AbstractActionController
 {
