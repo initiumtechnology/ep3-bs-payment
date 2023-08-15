@@ -312,14 +312,12 @@ class BookingController extends AbstractActionController
 
         // $acceptRulesDocument = $this->params()->fromPost('bf-accept-rules-document');
         // $acceptRulesText = $this->params()->fromPost('bf-accept-rules-text');
-        $acceptRulesDocument = 'on';
-        $acceptRulesText = 'on';
         $confirmationHash = sha1('Quick and dirty' . floor(time() / 1800));
         $confirmationHashOriginal = sha1('Quick and dirty' . floor(time() / 1800));
 
         if ($confirmationHash) {
 
-            // Check if users accepted the terms
+            // Check if users accepted the rules associated with the squares
 
             // if ($square->getMeta('rules.document.file') && $acceptRulesDocument != 'on') {
             //     $byproducts['message'] = sprintf($this->t('%sNote:%s Please read and accept the "%s".'),
@@ -336,7 +334,7 @@ class BookingController extends AbstractActionController
             //         '<b>', '</b>');
             // }
 
-        //   if (! isset($byproducts['message'])) {
+          if (! isset($byproducts['message'])) {
 
         //     $bookingService = $serviceManager->get('Booking\Service\BookingService');
         //     $bookingManager = $serviceManager->get('Booking\Manager\BookingManager');
@@ -505,7 +503,7 @@ class BookingController extends AbstractActionController
 
         //         return $this->redirectBack()->toOrigin();
         //     }                
-        //   }     
+          }     
 
         }
     //    return $this->ajaxViewModel($byproducts);
