@@ -206,7 +206,7 @@ class BookingController extends AbstractActionController
         if (! $user) {
             $query = $this->getRequest()->getUri()->getQueryAsArray();
             $query['ajax'] = 'false';
-            $this->redirectBack()->setOrigin('square/booking/checkout');
+            // $this->redirectBack()->setOrigin('square/booking/checkout');
             return $this->redirect()->toRoute('user/login');
         }
 
@@ -367,6 +367,9 @@ class BookingController extends AbstractActionController
                 $bookings[] = array('b' => $bookingService->createSingle($user, $square, 1, $byproducts['dateStart'], $byproducts['dateEnd'], $bills, $meta),
                                     'p' => $cartItem['price']);
             }
+
+            // Clear cart
+            $cartService->setItems([]);
             
             /* Go to payment */
             if (($payservice == 'paypal' || $payservice == 'stripe' || $payservice == 'klarna') && $payable) {
