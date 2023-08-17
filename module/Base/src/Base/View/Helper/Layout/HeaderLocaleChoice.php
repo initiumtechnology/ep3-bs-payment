@@ -52,8 +52,6 @@ class HeaderLocaleChoice extends AbstractHelper
                 $href = $uriString . '?locale=' . $locale;
             }
 
-            $html .= sprintf('<div><a href="%1$s" title="%2$s" class="unlined white"><img src="%3$s" alt="%2$s"></a></div>',
-                $href, $title, $view->basePath('imgs/icons/locale/' . $locale . '.png'));
         }
 
         $html .= '</div>';
