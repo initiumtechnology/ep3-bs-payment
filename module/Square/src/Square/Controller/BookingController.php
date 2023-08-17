@@ -175,7 +175,7 @@ class BookingController extends AbstractActionController
         $itemExists = false;
 
         foreach ($cartItems as $cartItem) {
-            if ($cartItem['squareName'] === $bookingInfo['squareName'] &&
+            if ($cartItem['square'] === $bookingInfo['square'] &&
                 $cartItem['start'] === $bookingInfo['start'] &&
                 $cartItem['end'] === $bookingInfo['end']) {
                 $itemExists = true;
