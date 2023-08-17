@@ -643,6 +643,8 @@ class BookingController extends AbstractActionController
         $serviceManager = $this->getServiceLocator();
         $bookingManager = $serviceManager->get('Booking\Manager\BookingManager');
         $squareManager = $serviceManager->get('Square\Manager\SquareManager');
+        $squareValidator = $serviceManager->get('Square\Service\SquareValidator');
+
 
         $bookingService = $serviceManager->get('Booking\Service\BookingService');
 
