@@ -229,7 +229,7 @@ class BookingController extends AbstractActionController
         // Re-index the array if needed
         $cartItems = array_values($cartItems);
 
-        syslog(LOG_EMERG, 'printing cart in confirm action');
+        syslog(LOG_EMERG, 'printing cart in checkout action');
         syslog(LOG_EMERG, json_encode($cartItems));
 
         // Check if the user is a member
@@ -243,12 +243,13 @@ class BookingController extends AbstractActionController
         $allAvailable = True;
         $total = 0;
 
+
         // Check if each square still available
         $squareValidator = $serviceManager->get('Square\Service\SquareValidator');
         $squarePricingManager = $serviceManager->get('Square\Manager\SquarePricingManager');
         foreach ($cartItems as &$cartItem) {
             $byproducts = $squareValidator->isBookable($cartItem['dateStart'], $cartItem['dateEnd'], $cartItem['timeStart'], $cartItem['timeEnd'], $cartItem['square']);
-            
+
             // If the booking is no longer available
             if (! $byproducts['bookable']) {
                 $this->flashMessenger()->addErrorMessage(sprintf($this->t('%sThe booking is no longer available!%s'),
@@ -267,6 +268,10 @@ class BookingController extends AbstractActionController
             $cartItem['price'] = $finalPrice['price'];
         }
 
+        // printing byproducts
+        syslog(LOG_EMERG, 'printing byproducts');
+        syslog(LOG_EMERG, json_encode($byproducts));
+
         // If not all available, warn user and refresh cart
         if(! $allAvailable) {
             // Update the cart with the available items
@@ -279,8 +284,10 @@ class BookingController extends AbstractActionController
         $payable = false;
 
         // // billing for products??? (need to check later)
-        $bills = array();
-        // foreach ($products as $product) {
+         //$products = $byproducts['products'];
+
+         $bills = array();
+        //  foreach ($products as $product) {
 
         //     $bills[] = new Bill(array(
         //        'description' => $product->need('name'),
@@ -380,20 +387,32 @@ class BookingController extends AbstractActionController
                 if (($payservice == 'paypal' || $payservice == 'stripe' || $payservice == 'klarna') && $payable) {
                        $meta['directpay'] = 'true';
                 }
-    
+
+                //printing data to create booking
+                syslog(LOG_EMERG, 'printing data to create booking');
+                syslog(LOG_EMERG, json_encode($user));
+                syslog(LOG_EMERG, json_encode($square));
+                syslog(LOG_EMERG, json_encode($quantityParam));
+                syslog(LOG_EMERG, json_encode($byproducts['dateStart']));
+                syslog(LOG_EMERG, json_encode($byproducts['dateEnd']));
+                syslog(LOG_EMERG, json_encode($bills));
+                syslog(LOG_EMERG, json_encode($meta));
+                syslog(LOG_EMERG, 'printing data to create booking - end');
+
+
                 // Create booking and add to list
                 $bookings[] = array('b' => $bookingService->createSingle($user, $square, 1, $byproducts['dateStart'], $byproducts['dateEnd'], $bills, $meta),
                                     'p' => $cartItem['price']);
             }
 
-            // Clear cart
-            $cartService->setItems([]);
+            syslog(LOG_EMERG, 'printing bookings');
+            syslog(LOG_EMERG, json_encode($bookings));
 
             /* Go to payment */
             if (($payservice == 'paypal' || $payservice == 'stripe' || $payservice == 'klarna') && $payable) {
             # payment checkout
                 if($payable) {
-                    
+
                    $basepath = $this->config('basepath');
                    if (isset($basepath) && $basepath != '' && $basepath != ' ') {
                        $basepath = '/'.$basepath;  
@@ -443,7 +462,7 @@ class BookingController extends AbstractActionController
                         // add booking id to description
                         $description = $description.$booking->get('bid');
                    }
-                   
+
                    #stripe checkout
                    if ($payservice == 'stripe') {
                        $model["payment_method_types"] = $this->config('stripePaymentMethods');
@@ -465,7 +484,7 @@ class BookingController extends AbstractActionController
                 //    $this->flashMessenger()->addSuccessMessage(sprintf($this->t('%sPayment and Booking Succeed%s'),
                 //        '<b>', '</b>'));
 
-                syslog(LOG_EMERG, 'Done with checkout action');
+                    syslog(LOG_EMERG, 'End of checkout action');
                    return $this->redirect()->toUrl($captureToken->getTargetUrl());
                    }
                 else {
@@ -477,11 +496,10 @@ class BookingController extends AbstractActionController
                    $this->flashMessenger()->addErrorMessage(sprintf($this->t('%sSorry online booking not possible at the moment!%s'),
                        '<b>', '</b>'));
                    return $this->redirectBack()->toOrigin();  
-                }    
+                }
                 # payment checkout
             } else {
                 # no paymentservice
-                
                 # redefine user budget
                 if ($budgetpayment) { 
                     $userManager = $serviceManager->get('User\Manager\UserManager');
@@ -496,9 +514,8 @@ class BookingController extends AbstractActionController
                     $booking->set('status_billing', 'paid');
                     $notes = $notes . " payment with user budget";
                     $booking->setMeta('notes', $notes);
-                    $bookingManager->save($booking);                   
-                }
-                
+                    $bookingManager->save($booking);
+
                 // What is doorcode ?? (need to check later)
                 // if ($this->config('genDoorCode') != null && $this->config('genDoorCode') == true && $square->getMeta('square_control') == true) {
                 //     $doorCode = $booking->getMeta('doorCode');
@@ -522,11 +539,15 @@ class BookingController extends AbstractActionController
                 }
 
                 return $this->redirectBack()->toOrigin();
-            }                
-          }     
+            }
+          }
         }
+
+        // Clear cart
+        $cartService->setItems([]);
         return $this->ajaxViewModel($byproducts);
     }
+}
 
     public function cancellationAction()
     {
@@ -610,13 +631,13 @@ class BookingController extends AbstractActionController
         $gateway->execute($status = new GetHumanStatus($token));
 
         $payment = $status->getFirstModel();
+        syslog(LOG_EMERG, 'confirm action triggered');
 
          syslog(LOG_EMERG, $payment['status']);
          syslog(LOG_EMERG, json_encode($payment));
 
         if (($payment['status'] == "requires_action" && !(array_key_exists('error',$payment)))) {
             
-           syslog(LOG_EMERG, "confirm success");
           $payment['doneAction'] = $token->getTargetUrl();
 
            try {
