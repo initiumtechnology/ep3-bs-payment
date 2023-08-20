@@ -214,6 +214,24 @@ class BookingController extends AbstractActionController
         $cartService = Cart::getInstance();
         $cartItems = $cartService->getItems();
 
+        //clear cart if the square is dated old
+        // Get the current datetime
+        $current_datetime = date('Y-m-d H:i:s'); // Format it as 'YYYY-MM-DD HH:MM:SS'
+
+        // Iterate through the $cartItem array and remove items where "start" time is before the current datetime
+        foreach ($cartItems as $key => $item) {
+            $start_time = $item['start'];
+            if ($start_time < $current_datetime) {
+                unset($cartItems[$key]);
+            }
+        }
+
+        // Re-index the array if needed
+        $cartItems = array_values($cartItems);
+
+        syslog(LOG_EMERG, 'printing cart in confirm action');
+        syslog(LOG_EMERG, json_encode($cartItems));
+
         // Check if the user is a member
         $member = 0;
         if ($user != null && $user->getMeta('member') != null) {
@@ -370,7 +388,7 @@ class BookingController extends AbstractActionController
 
             // Clear cart
             $cartService->setItems([]);
-            
+
             /* Go to payment */
             if (($payservice == 'paypal' || $payservice == 'stripe' || $payservice == 'klarna') && $payable) {
             # payment checkout
@@ -447,6 +465,7 @@ class BookingController extends AbstractActionController
                 //    $this->flashMessenger()->addSuccessMessage(sprintf($this->t('%sPayment and Booking Succeed%s'),
                 //        '<b>', '</b>'));
 
+                syslog(LOG_EMERG, 'Done with checkout action');
                    return $this->redirect()->toUrl($captureToken->getTargetUrl());
                    }
                 else {
@@ -506,7 +525,7 @@ class BookingController extends AbstractActionController
             }                
           }     
         }
-    //    return $this->ajaxViewModel($byproducts);
+        return $this->ajaxViewModel($byproducts);
     }
 
     public function cancellationAction()
@@ -575,6 +594,7 @@ class BookingController extends AbstractActionController
             return $this->redirectBack()->toOrigin();
         }
 
+
         return $this->ajaxViewModel(array(
             'bid' => $bid,
             'origin' => $origin,
@@ -591,21 +611,21 @@ class BookingController extends AbstractActionController
 
         $payment = $status->getFirstModel();
 
-        // syslog(LOG_EMERG, $payment['status']);
-        // syslog(LOG_EMERG, json_encode($payment));
+         syslog(LOG_EMERG, $payment['status']);
+         syslog(LOG_EMERG, json_encode($payment));
 
         if (($payment['status'] == "requires_action" && !(array_key_exists('error',$payment)))) {
             
-          // syslog(LOG_EMERG, "confirm success");
+           syslog(LOG_EMERG, "confirm success");
           $payment['doneAction'] = $token->getTargetUrl();
 
            try {
-               // syslog(LOG_EMERG, "executing confirm");
+                syslog(LOG_EMERG, "executing confirm");
 
                $gateway->execute(new Confirm($payment));
 
-               // syslog(LOG_EMERG, $payment['status']);
-               // syslog(LOG_EMERG, json_encode($payment));
+                syslog(LOG_EMERG, $payment['status']);
+                syslog(LOG_EMERG, json_encode($payment));
 
            } catch (ReplyInterface $reply) {
                if ($reply instanceof HttpRedirect) {
@@ -624,9 +644,9 @@ class BookingController extends AbstractActionController
         }
    
         if ($payment['status'] != "requires_action" || array_key_exists('error',$payment)) {
-           // syslog(LOG_EMERG, json_encode($payment)); 
-           // syslog(LOG_EMERG, $payment['status']); 
-           // syslog(LOG_EMERG, "confirm error");
+            syslog(LOG_EMERG, json_encode($payment)); 
+            syslog(LOG_EMERG, $payment['status']); 
+            syslog(LOG_EMERG, "confirm error");
            $doneAction = str_replace("confirm", "done", $token->getTargetUrl());
 
            $token->setTargetUrl($doneAction);
@@ -638,12 +658,14 @@ class BookingController extends AbstractActionController
 
     public function doneAction()
     {
-        // syslog(LOG_EMERG, 'doneAction');
+         syslog(LOG_EMERG, 'doneAction');
         
         $serviceManager = $this->getServiceLocator();
         $bookingManager = $serviceManager->get('Booking\Manager\BookingManager');
         $squareManager = $serviceManager->get('Square\Manager\SquareManager');
         $squareValidator = $serviceManager->get('Square\Service\SquareValidator');
+
+
 
 
         $bookingService = $serviceManager->get('Booking\Service\BookingService');
@@ -656,8 +678,20 @@ class BookingController extends AbstractActionController
 
         $payment = $status->getFirstModel();
 
-        // syslog(LOG_EMERG, json_encode($status));
-        // syslog(LOG_EMERG, json_encode($payment));
+         syslog(LOG_EMERG, json_encode($status));
+
+
+        // Retrieve the booking details from the cart
+        $cartService = Cart::getInstance();
+        $cartItems = $cartService->getItems();
+
+        syslog(LOG_EMERG, 'print cart in done action');
+
+        syslog(LOG_EMERG, json_encode($cartItems));
+
+        syslog(LOG_EMERG, 'print payment in done action');
+
+        syslog(LOG_EMERG, json_encode($payment));
 
         $origin = $this->redirectBack()->getOriginAsUrl();
 
@@ -689,6 +723,10 @@ class BookingController extends AbstractActionController
         $booking = $bookingManager->get($bid);
         $notes = $booking->getMeta('notes');
 
+        syslog(LOG_EMERG, 'print booking manager');
+        syslog(LOG_EMERG,$booking);
+        syslog(LOG_EMERG,json_encode($booking));
+
         $notes = $notes . $paymentNotes;
 
         $square = $squareManager->get($booking->need('sid'));
@@ -696,7 +734,7 @@ class BookingController extends AbstractActionController
 
         if ($status->isCaptured() || $status->isAuthorized() || $status->isPending() || ($status->isUnknown() && $payment['status'] == 'processing') || $status->getValue() === "success" || $payment['status'] === "succeeded" ) {
 
-            // syslog(LOG_EMERG, 'doneAction - success');
+             syslog(LOG_EMERG, 'doneAction - success');
             
             if (!$booking->getMeta('directpay_pending') == 'true') {
                 if ($this->config('genDoorCode') != null && $this->config('genDoorCode') == true && $square->getMeta('square_control') == true) {
@@ -711,20 +749,22 @@ class BookingController extends AbstractActionController
                    }
                 }
                 else {
-                    // syslog(LOG_EMERG, 'success not pending');
+                     syslog(LOG_EMERG, 'success not pendingh');
                     $this->flashMessenger()->addSuccessMessage(sprintf($this->t('%sCongratulations:%s Your %s has been booked!'),
                         '<b>', '</b>',$this->option('subject.square.type')));
                 }
             }
 
             if($status->isPending() || ($status->isUnknown() && $payment['status'] == 'processing')) {
-                // syslog(LOG_EMERG, 'success pending/processing');
+                 syslog(LOG_EMERG, 'success pending/processing');
                 $booking->set('status_billing', 'pending');
                 $booking->setMeta('directpay', 'false');
                 $booking->setMeta('directpay_pending', 'true');
+                 syslog(LOG_EMERG, 'success not pending');
             }
-            else {
-                // syslog(LOG_EMERG, 'success paid');
+            else { // need to do this to all items in the cart
+                
+                 syslog(LOG_EMERG, 'success paid');
                 $booking->set('status_billing', 'paid');
                 $booking->setMeta('directpay', 'true');
                 $booking->setMeta('directpay_pending', 'false');
@@ -746,7 +786,7 @@ class BookingController extends AbstractActionController
 	    }
 	    else
         {
-            // syslog(LOG_EMERG, 'doneAction - error');
+             syslog(LOG_EMERG, 'doneAction - error');
             
             if (!$booking->getMeta('directpay_pending') == 'true') {
                 if(isset($payment['error']['message'])) {
