@@ -518,23 +518,6 @@ class BookingController extends AbstractActionController
                     $booking->setMeta('notes', $notes);
                     $bookingManager->save($booking);
 
-                // What is doorcode ?? (need to check later)
-                // if ($this->config('genDoorCode') != null && $this->config('genDoorCode') == true && $square->getMeta('square_control') == true) {
-                //     $doorCode = $booking->getMeta('doorCode');
-                //     $squareControlService = $serviceManager->get('SquareControl\Service\SquareControlService');
-                //     if ($squareControlService->createDoorCode($booking->need('bid'), $doorCode) == true) {
-                //         $this->flashMessenger()->addSuccessMessage(sprintf($this->t('Your %s has been booked! The doorcode is: %s'),
-                //             $this->option('subject.square.type'), $doorCode));
-                //     } else {
-                //         $this->flashMessenger()->addErrorMessage(sprintf($this->t('Your %s has been booked! But the doorcode could not be send. Please contact admin by phone - %s'),
-                //             $this->option('subject.square.type'), $this->option('client.contact.phone')));
-                //     }
-                // }
-                // else{
-                //     $this->flashMessenger()->addSuccessMessage(sprintf($this->t('%sCongratulations:%s Your %s has been booked!'),
-                //         '<b>', '</b>',$this->option('subject.square.type')));
-                // }  
-
                 if ($this->config('tmpBookingAt') != null) {    
                     $this->flashMessenger()->addSuccessMessage(sprintf($this->t('%sPayment and admittance temporarily at %s!%s'),
                         '<b>', $this->config('tmpBookingAt'), '</b>'));
