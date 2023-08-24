@@ -460,8 +460,10 @@ class BookingController extends AbstractActionController
                         $budget = $newbudget;
 
                         // add booking id to description
-                        $description = $description.$booking->get('bid');
+                        $description = $description.$booking->get('bid').',';
                    }
+                   // remove extra comma
+                   $description = rtrim($description, ",");
 
                    #stripe checkout
                    if ($payservice == 'stripe') {
@@ -685,140 +687,127 @@ class BookingController extends AbstractActionController
         $bookingManager = $serviceManager->get('Booking\Manager\BookingManager');
         $squareManager = $serviceManager->get('Square\Manager\SquareManager');
         $squareValidator = $serviceManager->get('Square\Service\SquareValidator');
-
-
-
-
         $bookingService = $serviceManager->get('Booking\Service\BookingService');
 
         $token = $serviceManager->get('payum.security.http_request_verifier')->verify($this);
-
         $gateway = $serviceManager->get('payum')->getGateway($token->getGatewayName());
-
         $gateway->execute($status = new GetHumanStatus($token));
-
         $payment = $status->getFirstModel();
-
-         syslog(LOG_EMERG, json_encode($status));
-
+        
+        syslog(LOG_EMERG, json_encode($status));
 
         // Retrieve the booking details from the cart
         $cartService = Cart::getInstance();
         $cartItems = $cartService->getItems();
 
         syslog(LOG_EMERG, 'print cart in done action');
-
         syslog(LOG_EMERG, json_encode($cartItems));
-
         syslog(LOG_EMERG, 'print payment in done action');
-
         syslog(LOG_EMERG, json_encode($payment));
 
         $origin = $this->redirectBack()->getOriginAsUrl();
 
         $bid = -1;  
         $paymentNotes = '';        
-#paypal
-        if ($token->getGatewayName() == 'paypal_ec') {
-            $bid = $payment['PAYMENTREQUEST_0_BID'];
-            $paymentNotes = ' direct pay with paypal - ';
-        }
-#paypal
+
 #stripe
         if ($token->getGatewayName() == 'stripe') {
             $bid = $payment['metadata']['bid'];
             $paymentNotes = ' direct pay with stripe ' . $payment['charges']['data'][0]['payment_method_details']['type'] . ' - ';
         }
 #stripe
-#klarna
-        if ($token->getGatewayName() == 'klarna') {
-            $bid = $payment['items']['reference'];
-            $paymentNotes = ' direct pay with klarna - ';
-        }
-#klarna
-        
-        if (! (is_numeric($bid) && $bid > 0)) {
-            throw new RuntimeException('This booking does not exist');
-        }
 
-        $booking = $bookingManager->get($bid);
-        $notes = $booking->getMeta('notes');
+        // iterate through bookings
+        preg_match_all('/\d+/', $payment['description'], $matches);
+        $bids = $matches[0];
+        syslog(LOG_EMERG, json_encode($bids));
+        foreach ($bids as $bid) {
+            if (! (is_numeric($bid) && $bid > 0)) {
+                throw new RuntimeException('This booking does not exist');
+            }
+    
+            $booking = $bookingManager->get($bid);
+            $notes = $booking->getMeta('notes');
+    
+            syslog(LOG_EMERG, 'print booking manager');
+            syslog(LOG_EMERG,$booking);
+            syslog(LOG_EMERG,json_encode($booking));
+    
+            $notes = $notes . $paymentNotes;
+    
+            $square = $squareManager->get($booking->need('sid'));
 
-        syslog(LOG_EMERG, 'print booking manager');
-        syslog(LOG_EMERG,$booking);
-        syslog(LOG_EMERG,json_encode($booking));
+            if ($status->isCaptured() || $status->isAuthorized() || $status->isPending() || ($status->isUnknown() && $payment['status'] == 'processing') || $status->getValue() === "success" || $payment['status'] === "succeeded" ) {
 
-        $notes = $notes . $paymentNotes;
-
-        $square = $squareManager->get($booking->need('sid'));
-
-
-        if ($status->isCaptured() || $status->isAuthorized() || $status->isPending() || ($status->isUnknown() && $payment['status'] == 'processing') || $status->getValue() === "success" || $payment['status'] === "succeeded" ) {
-
-             syslog(LOG_EMERG, 'doneAction - success');
-            
-            if (!$booking->getMeta('directpay_pending') == 'true') {
-                if ($this->config('genDoorCode') != null && $this->config('genDoorCode') == true && $square->getMeta('square_control') == true) {
-                   $doorCode = $booking->getMeta('doorCode');  
-                   $squareControlService = $serviceManager->get('SquareControl\Service\SquareControlService'); 
-                   if ($squareControlService->createDoorCode($bid, $doorCode) == true) {
-                       $this->flashMessenger()->addSuccessMessage(sprintf($this->t('Your %s has been booked! The doorcode is: %s'),
-                           $this->option('subject.square.type'), $doorCode));
-                   } else {
-                       $this->flashMessenger()->addErrorMessage(sprintf($this->t('Your %s has been booked! But the doorcode could not be send. Please contact admin by phone - %s'),
-                           $this->option('subject.square.type'), $this->option('client.contact.phone')));
+                syslog(LOG_EMERG, 'doneAction - success');
+               
+               if (!$booking->getMeta('directpay_pending') == 'true') {
+                   if ($this->config('genDoorCode') != null && $this->config('genDoorCode') == true && $square->getMeta('square_control') == true) {
+                      $doorCode = $booking->getMeta('doorCode');  
+                      $squareControlService = $serviceManager->get('SquareControl\Service\SquareControlService'); 
+                      if ($squareControlService->createDoorCode($bid, $doorCode) == true) {
+                          $this->flashMessenger()->addSuccessMessage(sprintf($this->t('Your %s has been booked! The doorcode is: %s'),
+                              $this->option('subject.square.type'), $doorCode));
+                      } else {
+                          $this->flashMessenger()->addErrorMessage(sprintf($this->t('Your %s has been booked! But the doorcode could not be send. Please contact admin by phone - %s'),
+                              $this->option('subject.square.type'), $this->option('client.contact.phone')));
+                      }
                    }
-                }
-                else {
-                     syslog(LOG_EMERG, 'success not pendingh');
-                    $this->flashMessenger()->addSuccessMessage(sprintf($this->t('%sCongratulations:%s Your %s has been booked!'),
-                        '<b>', '</b>',$this->option('subject.square.type')));
-                }
-            }
+                   else {
+                        syslog(LOG_EMERG, 'success not pending');
+                       $this->flashMessenger()->addSuccessMessage(sprintf($this->t('%sCongratulations:%s Your %s has been booked!'),
+                           '<b>', '</b>',$this->option('subject.square.type')));
+                   }
+               }
+   
+               if($status->isPending() || ($status->isUnknown() && $payment['status'] == 'processing')) {
+                    syslog(LOG_EMERG, 'success pending/processing');
+                   $booking->set('status_billing', 'pending');
+                   $booking->setMeta('directpay', 'false');
+                   $booking->setMeta('directpay_pending', 'true');
+                    syslog(LOG_EMERG, 'success not pending');
+               }
+               else { // need to do this to all items in the cart
+                   
+                    syslog(LOG_EMERG, 'success paid');
+                   $booking->set('status_billing', 'paid');
+                   $booking->setMeta('directpay', 'true');
+                   $booking->setMeta('directpay_pending', 'false');
+               }
+   
+               # redefine user budget
+               if ($booking->getMeta('hasBudget')) {
+                   $userManager = $serviceManager->get('User\Manager\UserManager');
+                   $user = $userManager->get($booking->get('uid'));
+                   $user->setMeta('budget', $booking->getMeta('newbudget'));
+                   $userManager->save($user);
+                   # set booking to paid
+                   $notes = $notes . " payment with user budget | ";
+               }
+   
+               $notes = $notes . " payment_status: " . $status->getValue() . ' ' . $payment['status'];
+               $booking->setMeta('notes', $notes);
+               $bookingService->updatePaymentSingle($booking);
+           }
+           else
+           {
+                syslog(LOG_EMERG, 'doneAction - error');
+               
+               if (!$booking->getMeta('directpay_pending') == 'true') {
+                   if(isset($payment['error']['message'])) {
+                       $this->flashMessenger()->addErrorMessage(sprintf($payment['error']['message'],
+                                               '<b>', '</b>'));
+                   }
+                   $this->flashMessenger()->addErrorMessage(sprintf($this->t('%sError during payment: Your booking has been cancelled.%s'),
+                       '<b>', '</b>'));
+               }
+               $bookingService->cancelSingle($booking);
+           }
+        }
 
-            if($status->isPending() || ($status->isUnknown() && $payment['status'] == 'processing')) {
-                 syslog(LOG_EMERG, 'success pending/processing');
-                $booking->set('status_billing', 'pending');
-                $booking->setMeta('directpay', 'false');
-                $booking->setMeta('directpay_pending', 'true');
-                 syslog(LOG_EMERG, 'success not pending');
-            }
-            else { // need to do this to all items in the cart
-                
-                 syslog(LOG_EMERG, 'success paid');
-                $booking->set('status_billing', 'paid');
-                $booking->setMeta('directpay', 'true');
-                $booking->setMeta('directpay_pending', 'false');
-            }
-
-            # redefine user budget
-            if ($booking->getMeta('hasBudget')) {
-                $userManager = $serviceManager->get('User\Manager\UserManager');
-                $user = $userManager->get($booking->get('uid'));
-                $user->setMeta('budget', $booking->getMeta('newbudget'));
-                $userManager->save($user);
-                # set booking to paid
-                $notes = $notes . " payment with user budget | ";
-            }
-
-            $notes = $notes . " payment_status: " . $status->getValue() . ' ' . $payment['status'];
-            $booking->setMeta('notes', $notes);
-            $bookingService->updatePaymentSingle($booking);
-	    }
-	    else
-        {
-             syslog(LOG_EMERG, 'doneAction - error');
-            
-            if (!$booking->getMeta('directpay_pending') == 'true') {
-                if(isset($payment['error']['message'])) {
-                    $this->flashMessenger()->addErrorMessage(sprintf($payment['error']['message'],
-                                            '<b>', '</b>'));
-                }
-                $this->flashMessenger()->addErrorMessage(sprintf($this->t('%sError during payment: Your booking has been cancelled.%s'),
-                    '<b>', '</b>'));
-            }
-            $bookingService->cancelSingle($booking);
-        }  
+        // Clear cart
+        $cartService = Cart::getInstance();
+        $cartService->setItems([]);
 
         return $this->redirectBack()->toOrigin();
    
