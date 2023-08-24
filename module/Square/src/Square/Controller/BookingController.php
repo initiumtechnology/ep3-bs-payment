@@ -483,9 +483,6 @@ class BookingController extends AbstractActionController
                    $captureToken->setTargetUrl($targetUrl);
                    $tokenStorage->update($captureToken);
 
-                //    $this->flashMessenger()->addSuccessMessage(sprintf($this->t('%sPayment and Booking Succeed%s'),
-                //        '<b>', '</b>'));
-
                     syslog(LOG_EMERG, 'End of checkout action');
                    return $this->redirect()->toUrl($captureToken->getTargetUrl());
                    }
@@ -510,21 +507,25 @@ class BookingController extends AbstractActionController
                     $user->setMeta('budget', $newbudget);
                     $userManager->save($user);
 
-                    // update booking info
-                    $booking->setMeta('budget', $budget);
-                    $booking->setMeta('newbudget', $newbudget);
-                    $booking->set('status_billing', 'paid');
-                    $notes = $notes . " payment with user budget";
-                    $booking->setMeta('notes', $notes);
-                    $bookingManager->save($booking);
+                    foreach ($bookings as &$tuple) {
+                        $booking = $tuple['b'];
+                        $bookingamt = $tuple['p'];
+                        // update booking info
+                        $booking->setMeta('budget', $budget);
+                        $booking->setMeta('newbudget', $newbudget);
+                        $booking->set('status_billing', 'paid');
+                        $notes = $notes . " payment with user budget";
+                        $booking->setMeta('notes', $notes);
+                        $bookingManager->save($booking);
+                    }
 
-                if ($this->config('tmpBookingAt') != null) {    
-                    $this->flashMessenger()->addSuccessMessage(sprintf($this->t('%sPayment and admittance temporarily at %s!%s'),
-                        '<b>', $this->config('tmpBookingAt'), '</b>'));
+                    if ($this->config('tmpBookingAt') != null) {    
+                        $this->flashMessenger()->addSuccessMessage(sprintf($this->t('%sPayment and admittance temporarily at %s!%s'),
+                            '<b>', $this->config('tmpBookingAt'), '</b>'));
+                    }
+
+                    return $this->redirectBack()->toOrigin();
                 }
-
-                return $this->redirectBack()->toOrigin();
-            }
           }
         }
 
