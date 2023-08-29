@@ -12,7 +12,7 @@ $project_config = require 'config/autoload/project.php';
 
 return array_merge($project_config, array(
     'db' => array(
-        'database' => 'ep3',
+        'database' => 'ep3-charlotte',
         'username' => 'root',
         'password' => 'root',
 
