@@ -126,7 +126,8 @@ code {
     width: 70px;
     height: 70px;
     opacity: 1.0;
-    background: url("../imgs-client/layout/logo.png") no-repeat center center
+    background: url("/* ../imgs-client/layout/logo.png */") no-repeat center center
+    
 }
 
 a#logo:active {
