@@ -524,6 +524,10 @@ class BookingController extends AbstractActionController
                             '<b>', $this->config('tmpBookingAt'), '</b>'));
                     }
 
+                    // Clear cart
+                    $cartService = Cart::getInstance();
+                    $cartService->setItems([]);
+
                     return $this->redirectBack()->toOrigin();
                 }
           }
