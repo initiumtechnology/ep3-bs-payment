@@ -460,10 +460,10 @@ class BookingController extends AbstractActionController
                         $budget = $newbudget;
 
                         // add booking id to description
-                        $description = $description.$booking->get('bid').';';
+                        $description = $description.$booking->get('bid').'_';
                    }
                    // remove extra comma
-                   $description = rtrim($description, ";");
+                   $description = rtrim($description, '_');
 
                    #stripe checkout
                    if ($payservice == 'stripe') {
