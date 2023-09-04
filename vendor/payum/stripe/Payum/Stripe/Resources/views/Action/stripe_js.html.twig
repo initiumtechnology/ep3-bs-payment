@@ -9,16 +9,17 @@
     {{ parent() }}
 
 {% set parts = model.description|split('-') %}
-{% set bids = parts|last|split(',') %}
+{% set bids = parts|last|split(';') %}
+{% set description = model.description|replace({';': '&'}) %}
 
 <main id="main" class="checkout">
     <header class="header">
       <img src="{{ model.metadata.instance }}/imgs-client/layout/logo.png" id="logo" />
-      <a class="shop abort" href="{{ model.metadata.instance }}/square/booking/cancellation?bid={{ bids|join(',') }}&confirmed=true">{{ model.metadata.locale == 'de-DE' ? 'Abbruch und zurück zu' : 'abort and back to' }} {{ model.metadata.projectShort }} Bookingsystem</a>
+      <a class="shop abort" href="{{ model.metadata.instance }}/square/booking/cancellation?bid={{ bids|join(';') }}&confirmed=true">{{ model.metadata.locale == 'de-DE' ? 'Abbruch und zurück zu' : 'abort and back to' }} {{ model.metadata.projectShort }} Bookingsystem</a>
     </header>
     <div id="checkout">
       <div>
-          <b>{{ model.description|default("") }}</b>
+          <b>{{ description|default("") }}</b>
       </div>
       <div id="payment-request">
         <div id="payment-request-button">Pay Button</div>
