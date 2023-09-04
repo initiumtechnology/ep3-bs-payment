@@ -524,6 +524,10 @@ class BookingController extends AbstractActionController
                             '<b>', $this->config('tmpBookingAt'), '</b>'));
                     }
 
+                    // Clear cart
+                    $cartService = Cart::getInstance();
+                    $cartService->setItems([]);
+
                     return $this->redirectBack()->toOrigin();
                 }
           }
@@ -537,75 +541,81 @@ class BookingController extends AbstractActionController
 
     public function cancellationAction()
     {
-        $bid = $this->params()->fromQuery('bid');
-
-        if (! (is_numeric($bid) && $bid > 0)) {
-            throw new RuntimeException('This booking does not exist');
-        }
-
         $serviceManager = $this->getServiceLocator();
         $bookingManager = $serviceManager->get('Booking\Manager\BookingManager');
         $bookingBillManager = $serviceManager->get('Booking\Manager\Booking\BillManager');
         $squareValidator = $serviceManager->get('Square\Service\SquareValidator');
 
-        $booking = $bookingManager->get($bid);
+        // get bids
+        $bid = $this->params()->fromQuery('bid');
 
-        $cancellable = $squareValidator->isCancellable($booking);
+        // iterate through bookings
+        preg_match_all('/\d+/', $bid, $matches);
+        $bids = $matches[0];
+        syslog(LOG_EMERG, json_encode($bids));
+        foreach ($bids as $bid) {
 
-        if (! $cancellable) {
-            throw new RuntimeException('This booking cannot be cancelled anymore online.');
-        }
-
-        $origin = $this->redirectBack()->getOriginAsUrl();
-
-        /* Check cancellation confirmation */
-
-        $confirmed = $this->params()->fromQuery('confirmed');
-
-        if ($confirmed == 'true') {
-
-            $bookingService = $serviceManager->get('Booking\Service\BookingService');
-
-            $userManager = $serviceManager->get('User\Manager\UserManager');
-            $user = $userManager->get($booking->get('uid'));
-
-            $bookingService->cancelSingle($booking);
-
-            # redefine user budget if status paid
-            if ($booking->need('status') == 'cancelled' && $booking->get('status_billing') == 'paid' && !$booking->getMeta('refunded') == 'true') {
-                $booking->setMeta('refunded', 'true');
-                $bookingManager->save($booking);
-                $bills = $bookingBillManager->getBy(array('bid' => $booking->get('bid')), 'bbid ASC');
-                $total = 0;
-                if ($bills) {
-                    foreach ($bills as $bill) {
-                        $total += $bill->need('price');
-                    }
-                }
-            
-                $olduserbudget = $user->getMeta('budget');
-                if ($olduserbudget == null || $olduserbudget == '') {
-                    $olduserbudget = 0;
-                }
-
-                $newbudget = ($olduserbudget*100+$total)/100;
-
-                $user->setMeta('budget', $newbudget);
-                $userManager->save($user);
+            if (! (is_numeric($bid) && $bid > 0)) {
+                throw new RuntimeException('This booking does not exist');
             }
 
+            $booking = $bookingManager->get($bid);
 
-            $this->flashMessenger()->addErrorMessage(sprintf($this->t('Your booking has been %scancelled%s.'),
-                '<b>', '</b>'));
+            $cancellable = $squareValidator->isCancellable($booking);
 
-            return $this->redirectBack()->toOrigin();
+            if (! $cancellable) {
+                throw new RuntimeException('This booking cannot be cancelled anymore online.');
+            }
+
+            $origin = $this->redirectBack()->getOriginAsUrl();
+
+            /* Check cancellation confirmation */
+            $confirmed = $this->params()->fromQuery('confirmed');
+
+            if ($confirmed == 'true') {
+
+                $bookingService = $serviceManager->get('Booking\Service\BookingService');
+    
+                $userManager = $serviceManager->get('User\Manager\UserManager');
+                $user = $userManager->get($booking->get('uid'));
+    
+                $bookingService->cancelSingle($booking);
+    
+                # redefine user budget if status paid
+                if ($booking->need('status') == 'cancelled' && $booking->get('status_billing') == 'paid' && !$booking->getMeta('refunded') == 'true') {
+                    $booking->setMeta('refunded', 'true');
+                    $bookingManager->save($booking);
+                    $bills = $bookingBillManager->getBy(array('bid' => $booking->get('bid')), 'bbid ASC');
+                    $total = 0;
+                    if ($bills) {
+                        foreach ($bills as $bill) {
+                            $total += $bill->need('price');
+                        }
+                    }
+                
+                    $olduserbudget = $user->getMeta('budget');
+                    if ($olduserbudget == null || $olduserbudget == '') {
+                        $olduserbudget = 0;
+                    }
+    
+                    $newbudget = ($olduserbudget*100+$total)/100;
+    
+                    $user->setMeta('budget', $newbudget);
+                    $userManager->save($user);
+                }
+
+            }
         }
 
+        $this->flashMessenger()->addErrorMessage(sprintf($this->t('Your booking has been %scancelled%s.'),
+        '<b>', '</b>'));
 
-        return $this->ajaxViewModel(array(
-            'bid' => $bid,
-            'origin' => $origin,
-        ));
+        return $this->redirectBack()->toOrigin();
+        
+        // return $this->ajaxViewModel(array(
+        //     'bid' => $bid,
+        //     'origin' => $origin,
+        // ));
     }
 
     public function confirmAction()
