@@ -457,27 +457,27 @@ class AccountController extends AbstractActionController
 
         /* Iban form */
 
-        $editIbanForm = $formElementManager->get('User\Form\EditIbanForm');
+        // $editIbanForm = $formElementManager->get('User\Form\EditIbanForm');
 
-        if ($this->getRequest()->isPost() && $editParam == 'iban') {
-            $editIbanForm->setData($this->params()->fromPost());
+        // if ($this->getRequest()->isPost() && $editParam == 'iban') {
+        //     $editIbanForm->setData($this->params()->fromPost());
 
-            if ($editIbanForm->isValid()) {
-                $data = $editIbanForm->getData();
+        //     if ($editIbanForm->isValid()) {
+        //         $data = $editIbanForm->getData();
 
-                $iban = $data['eif-iban'];
+        //         $iban = $data['eif-iban'];
 
-                $user->setMeta('iban', $iban);
-                $userManager->save($user);
+        //         $user->setMeta('iban', $iban);
+        //         $userManager->save($user);
 
-                $this->flashMessenger()->addSuccessMessage(sprintf($this->t('Your %sIBAN%s has been updated'),
-                    '<b>', '</b>'));
+        //         $this->flashMessenger()->addSuccessMessage(sprintf($this->t('Your %sIBAN%s has been updated'),
+        //             '<b>', '</b>'));
 
-                return $this->redirect()->toRoute('user/settings');
-            }
-        } else {
-            $editIbanForm->get('eif-iban')->setValue($user->getMeta('iban'));
-        }
+        //         return $this->redirect()->toRoute('user/settings');
+        //     }
+        // } else {
+        //     $editIbanForm->get('eif-iban')->setValue($user->getMeta('iban'));
+        // }
 
         /* Email form */
 
@@ -625,7 +625,7 @@ class AccountController extends AbstractActionController
             'user' => $user,
             'configManager' => $configManager,
             'editPhoneForm' => $editPhoneForm,
-            'editIbanForm' => $editIbanForm,
+            // 'editIbanForm' => $editIbanForm,
             'editEmailForm' => $editEmailForm,
             'editNotificationsForm' => $editNotificationsForm,
             'editPasswordForm' => $editPasswordForm,

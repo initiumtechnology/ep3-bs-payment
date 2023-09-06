@@ -171,41 +171,7 @@ $this->headScript()->appendFile($this->basePath('js/controller/user/settings.min
 
     <div class="separator-small"></div>
 
-    <div class="sandbox">
-        <div class="symbolic symbolic-info">
-            <div class="edit-label dark-gray"><?= $this->t('Update IBAN') ?></div>
-
-            <div class="edit-panel">
-                <div class="separator-small"></div>
-
-                <?php
-                $foo = 1;
-                
-                $form = $this->editIbanForm;
-                $form->setAttribute('method', 'post');
-                $form->setAttribute('action', $this->url('user/settings', array(), array('query' => array('edit' => 'iban'))));
-                $form->prepare();
-
-                echo $this->form()->openTag($form);
-                ?>
-
-                <table class="default-table" style="margin: 0px;">
-                    <tr>
-                        <td>
-                            <?= $this->formElement($form->get('eif-iban')) ?>
-                            <?= $this->formElementErrors($form->get('eif-iban')) ?>
-                            <?= $this->formElementNotes($form->get('eif-iban')) ?>
-                        </td>
-                        <td>
-                            <?= $this->formElement($form->get('eif-submit')) ?>
-                        </td>
-                    </tr>
-                </table>
-
-                <?= $this->form()->closeTag() ?>
-            </div>
-        </div>
-    </div> 
+    
 
     <div class="separator-small"></div>
 
