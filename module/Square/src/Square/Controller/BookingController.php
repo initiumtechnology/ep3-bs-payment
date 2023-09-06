@@ -607,15 +607,17 @@ class BookingController extends AbstractActionController
             }
         }
 
-        $this->flashMessenger()->addErrorMessage(sprintf($this->t('Your booking has been %scancelled%s.'),
-        '<b>', '</b>'));
-
-        return $this->redirectBack()->toOrigin();
+        $confirmed = $this->params()->fromQuery('confirmed');
+        if ($confirmed == 'true') {
+            $this->flashMessenger()->addErrorMessage(sprintf($this->t('Your booking has been %scancelled%s.'),
+            '<b>', '</b>'));
+            return $this->redirectBack()->toOrigin();
+        }
         
-        // return $this->ajaxViewModel(array(
-        //     'bid' => $bid,
-        //     'origin' => $origin,
-        // ));
+        return $this->ajaxViewModel(array(
+            'bid' => $bid,
+            'origin' => $origin,
+        ));
     }
 
     public function confirmAction()
