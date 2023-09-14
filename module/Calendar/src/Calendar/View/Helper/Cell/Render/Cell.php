@@ -4,9 +4,33 @@ namespace Calendar\View\Helper\Cell\Render;
 
 use Zend\View\Helper\AbstractHelper;
 use Base\Manager\OptionManager;
+use \Square\Factory\Cart;
+
 
 class Cell extends AbstractHelper
 {
+
+    private function arrays_match($array1, $array2) {
+        if (count($array1) !== count($array2)) {
+            return false; // If the arrays have different lengths, they can't match.
+        }
+    
+        foreach ($array1 as $key => $value) {
+            if (is_array($value)) {
+                // If the value is an array, compare it directly.
+                if ($value !== $array2[$key]) {
+                    return false; // If they don't match, return false.
+                }
+            } else {
+                // If the value is not an array, compare it directly.
+                if ($value !== $array2[$key]) {
+                    return false; // If they don't match, return false.
+                }
+            }
+        }
+    
+        return true; // If all elements match, return true.
+    }
 
     public function __construct(OptionManager $optionManager)
     {
@@ -23,6 +47,7 @@ class Cell extends AbstractHelper
             'te' => gmdate('H:i', $walkingTime + $timeBlock),
             's' => $square->need('sid'),
         ]];
+
 
         if ($cellLinkParams['query']['te'] == '00:00') {
             $cellLinkParams['query']['te'] = '24:00';
@@ -133,15 +158,103 @@ class Cell extends AbstractHelper
             }
         }
 
+        $cartService = Cart::getInstance();
+        $cartItems = $cartService->getItems();
+
+
+
+
+
+
+        //syslog(LOG_EMERG, print_r($cellLinkParams, true));
+
+        //if $cellLinkParamsCart
+
+
+       // syslog(LOG_EMERG, print_r($cartItems, true));
+
+       // syslog(LOG_EMERG, print_r(gmdate('H:i', $cartItems[0]['end']), true));
+
+//         Array
+// (
+//     [query] => Array
+//         (
+//             [ds] => 2023-09-13
+//             [ts] => 10:00
+//             [te] => 10:30
+//             [s] => 1
+//         )
+
+// )
+
+
+// Array
+// (
+//     [0] => Array
+//         (
+//             [square] => 1
+//             [start] => 2023-09-13 13:00:00
+//             [end] => 2023-09-13 13:30:00
+//             [dateStart] => 2023-09-13
+//             [dateEnd] => 2023-09-13
+//             [timeStart] => 13:00
+//             [timeEnd] => 13:30
+//         )
+
+// )                  
+
+
+$cellLinkParamsCart = ['query' => [
+    'ds' => $cartItems[0]['dateStart'],
+    'ts' => $cartItems[0]['timeStart'],
+    'te' => $cartItems[0]['timeEnd'],
+    's' => $cartItems[0]['square']
+    ]];
+
+
+if ($this->arrays_match($cellLinkParams, $cellLinkParamsCart)) {
+$match = true;
+} else {
+        $match = false;
+    }
+
+
+
+
+        //syslog(LOG_EMERG, print_r($reservationsForCell, true));
+        // syslog(LOG_EMERG, print_r($cellLinkParamsCart, true));
+
+
+
         if ($cellFree) {
             if ($cellReserved && $displayClubExceptions && ($user && !$user->getMeta('member'))) {
                 return $view->calendarCellRenderReserved($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);   
-            } else {             
+            } else {
                 return $view->calendarCellRenderFree($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);
             }    
-        } else {
+        } else if ($match == false) {
+            //syslog(LOG_EMERG, print_r($cellLinkParams, true));
+            //syslog(LOG_EMERG, print_r('printing from proc', true));
             return $view->calendarCellRenderOccupied($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);
         }
+        else if ($match) {
+            if (empty($cartItems[0]['dateStart'])) {
+                syslog(LOG_EMERG, print_r('empty array', true));
+            } else {
+                    $cellLinkParamsCart = ['query' => [
+                        'ds' => $cartItems[0]['dateStart'],
+                        'ts' => $cartItems[0]['timeStart'],
+                        'te' => $cartItems[0]['timeEnd'],
+                        's' => $cartItems[0]['square'],
+                    ]];
+                    //syslog(LOG_EMERG, print_r($cellLinkParamsCart, true));
+                    return $view->CalendarCellRenderCart($user, $cellLinkParamsCart);
+                }
+
+        }
+
     }
+
+
 
 }
