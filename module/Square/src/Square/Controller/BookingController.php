@@ -548,6 +548,7 @@ class BookingController extends AbstractActionController
 
         // get bids
         $bid = $this->params()->fromQuery('bid');
+        $confirmed = $this->params()->fromQuery('confirmed');
 
         // iterate through bookings
         preg_match_all('/\d+/', $bid, $matches);
@@ -570,8 +571,6 @@ class BookingController extends AbstractActionController
             $origin = $this->redirectBack()->getOriginAsUrl();
 
             /* Check cancellation confirmation */
-            $confirmed = $this->params()->fromQuery('confirmed');
-
             if ($confirmed == 'true') {
 
                 $bookingService = $serviceManager->get('Booking\Service\BookingService');
@@ -607,15 +606,16 @@ class BookingController extends AbstractActionController
             }
         }
 
-        $this->flashMessenger()->addErrorMessage(sprintf($this->t('Your booking has been %scancelled%s.'),
-        '<b>', '</b>'));
-
-        return $this->redirectBack()->toOrigin();
+        if ($confirmed == 'true') {
+            $this->flashMessenger()->addErrorMessage(sprintf($this->t('Your booking has been %scancelled%s.'),
+            '<b>', '</b>'));
+            return $this->redirectBack()->toOrigin();
+        }
         
-        // return $this->ajaxViewModel(array(
-        //     'bid' => $bid,
-        //     'origin' => $origin,
-        // ));
+        return $this->ajaxViewModel(array(
+            'bid' => $bid,
+            'origin' => $origin,
+        ));
     }
 
     public function confirmAction()
