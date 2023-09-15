@@ -140,7 +140,7 @@ class Cell extends AbstractHelper
                     $timeEnd = clone $walkingDate;
                     $timeBlockMinutes = $timeBlock/60;
                     $timeEnd = $timeEnd->modify("+{$timeBlockMinutes} minutes");
-                    
+
                     $resTimeStartParam = $square->getMeta('club_reserved_time_start');
                     $resTimeEndParam = $square->getMeta('club_reserved_time_end');
                     $resTimeStartParts = explode(':', $resTimeStartParam);
@@ -162,99 +162,61 @@ class Cell extends AbstractHelper
         $cartItems = $cartService->getItems();
 
 
-
-
-
-
-        //syslog(LOG_EMERG, print_r($cellLinkParams, true));
-
-        //if $cellLinkParamsCart
-
-
-       // syslog(LOG_EMERG, print_r($cartItems, true));
-
-       // syslog(LOG_EMERG, print_r(gmdate('H:i', $cartItems[0]['end']), true));
-
-//         Array
-// (
-//     [query] => Array
-//         (
-//             [ds] => 2023-09-13
-//             [ts] => 10:00
-//             [te] => 10:30
-//             [s] => 1
-//         )
-
-// )
-
-
-// Array
-// (
-//     [0] => Array
-//         (
-//             [square] => 1
-//             [start] => 2023-09-13 13:00:00
-//             [end] => 2023-09-13 13:30:00
-//             [dateStart] => 2023-09-13
-//             [dateEnd] => 2023-09-13
-//             [timeStart] => 13:00
-//             [timeEnd] => 13:30
-//         )
-
-// )                  
-
-
-$cellLinkParamsCart = ['query' => [
-    'ds' => $cartItems[0]['dateStart'],
-    'ts' => $cartItems[0]['timeStart'],
-    'te' => $cartItems[0]['timeEnd'],
-    's' => $cartItems[0]['square']
-    ]];
-
-
-if ($this->arrays_match($cellLinkParams, $cellLinkParamsCart)) {
-$match = true;
-} else {
-        $match = false;
-    }
-
-
-
-
-        //syslog(LOG_EMERG, print_r($reservationsForCell, true));
-        // syslog(LOG_EMERG, print_r($cellLinkParamsCart, true));
-
-
-
-        if ($cellFree) {
-            if ($cellReserved && $displayClubExceptions && ($user && !$user->getMeta('member'))) {
-                return $view->calendarCellRenderReserved($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);   
-            } else {
-                return $view->calendarCellRenderFree($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);
-            }    
-        } else if ($match == false) {
-            //syslog(LOG_EMERG, print_r($cellLinkParams, true));
-            //syslog(LOG_EMERG, print_r('printing from proc', true));
-            return $view->calendarCellRenderOccupied($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);
+        if (!empty($cartItems[0]['dateStart'])) {
+            $cellLinkParamsCart = ['query' => [
+                'ds' => $cartItems[0]['dateStart'],
+                'ts' => $cartItems[0]['timeStart'],
+                'te' => $cartItems[0]['timeEnd'],
+                's' => $cartItems[0]['square']
+                ]];
         }
-        else if ($match) {
-            if (empty($cartItems[0]['dateStart'])) {
-                syslog(LOG_EMERG, print_r('empty array', true));
-            } else {
-                    $cellLinkParamsCart = ['query' => [
-                        'ds' => $cartItems[0]['dateStart'],
-                        'ts' => $cartItems[0]['timeStart'],
-                        'te' => $cartItems[0]['timeEnd'],
-                        's' => $cartItems[0]['square'],
-                    ]];
-                    //syslog(LOG_EMERG, print_r($cellLinkParamsCart, true));
-                    return $view->CalendarCellRenderCart($user, $cellLinkParamsCart);
+        else {
+            $cellLinkParamsCart = [];
+        }
+
+
+        if ($this->arrays_match($cellLinkParams, $cellLinkParamsCart)) {
+            $match = true;
+        } else {
+            $match = false;
+        }
+
+            //syslog(LOG_EMERG, print_r($reservationsForCell, true));
+            //syslog(LOG_EMERG, print_r($cellLinkParamsCart, true));
+
+            if ($cellFree && $match == false) {
+                //syslog(LOG_EMERG, print_r('Free cell', true));
+                if ($cellReserved && $displayClubExceptions && ($user && !$user->getMeta('member'))) {
+                    return $view->calendarCellRenderReserved($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);   
+                } else {
+                    return $view->calendarCellRenderFree($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);
                 }
+            } else if ($match == false) {
+                //syslog(LOG_EMERG, print_r('Occupied cell', true));
+                //syslog(LOG_EMERG, print_r($cellLinkParams, true));
+                //syslog(LOG_EMERG, print_r('printing from proc', true));
+                return $view->calendarCellRenderOccupied($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);
+            }
+            else if ($match == true) {
+                syslog(LOG_EMERG, print_r('Cart cell', true));
+
+                if (empty($cartItems[0]['dateStart'])) {
+                    syslog(LOG_EMERG, print_r('empty array', true));
+                } else {
+                        $cellLinkParamsCart = ['query' => [
+                            'ds' => $cartItems[0]['dateStart'],
+                            'ts' => $cartItems[0]['timeStart'],
+                            'te' => $cartItems[0]['timeEnd'],
+                            's' => $cartItems[0]['square'],
+                        ]];
+                        //syslog(LOG_EMERG, print_r($cellLinkParamsCart, true));
+                        return $view->CalendarCellRenderCart($user, $cellLinkParamsCart);
+                    }
+
+            }
 
         }
 
+
+
     }
-
-
-
-}
