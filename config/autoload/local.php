@@ -12,17 +12,17 @@ $project_config = require 'config/autoload/project.php';
 
 return array_merge($project_config, array(
     'db' => array(
-        'database' => 'ep3',
-        'username' => 'root',
-        'password' => 'root',
+        'database' => 'u216054559_ep3bs',
+        'username' => 'u216054559_ep3bs',
+        'password' => 'Profitbadminton123*',
 
         'hostname' => 'localhost',
-        'port' => null,
+        'port' => '3306',
     ),
     'mail' => array(
-        'type' => 'sendmail', // or 'smtp' or 'smtp-tls'
-        'address' => 'info@localhost',
-            // Make sure 'bookings.example.com' matches the hosting domain when using type 'sendmail'
+        'type' => 'sendmail', // 'sendmail' or 'smtp' or 'smtp-tls'
+        'address' => 'info@initiumtech.com.au',
+                // Make sure 'bookings.example.com' matches the hosting domain when using type 'sendmail'
 
         'host' => '?', // for 'smtp' type only, otherwise remove or leave as is
         'user' => '?', // for 'smtp' type only, otherwise remove or leave as is

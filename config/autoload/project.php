@@ -5,16 +5,16 @@
  */
 
 
-$instance = 'public';
+$$instance = 'public';
 
 return array(
     // basepath of the instance on your server - i.e. tvas-booking-dev for https://tennis-rudolstadt.de/tvas-booking-dev or '' if you don't have a basepath square/ i.e. 
     // if you don't point to your public dir directly as described in the install doc of the original project you have to point here to $instance."/public" 
     'basepath' => $instance,
     // origin url of your server - http://yourip - if  you don't have a proxy, baseurl and proxyurl should be the same like https://tennis-rudolstadt.de
-    'baseurl' => 'http://localhost:8000',
+    'baseurl' => 'http://initiumtech.com.au',
     // the proxy url - i.e. https://tennis-rudolstadt.de
-    'proxyurl' => 'http://localhost:8000',
+    'proxyurl' => 'http://initiumtech.com.au',
     'cookie_config' => array(
         'cookie_name_prefix' => $instance,
     ),
