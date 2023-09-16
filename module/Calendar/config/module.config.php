@@ -44,6 +44,7 @@ return array(
             'CalendarCellRenderFree' => 'Calendar\View\Helper\Cell\Render\Free',
             'CalendarCellRenderFreeForPrivileged' => 'Calendar\View\Helper\Cell\Render\FreeForPrivileged',
             'CalendarCellRenderOccupied' => 'Calendar\View\Helper\Cell\Render\Occupied',
+            'CalendarCellRenderCart' => 'Calendar\View\Helper\Cell\Render\CartFill',
             'CalendarCellRenderOccupiedForVisitors' => 'Calendar\View\Helper\Cell\Render\OccupiedForVisitors',
             'CalendarCellRenderReserved' => 'Calendar\View\Helper\Cell\Render\Reserved',
             'CalendarCellRenderReservedForPrivileged' => 'Calendar\View\Helper\Cell\Render\ReservedForPrivileged',

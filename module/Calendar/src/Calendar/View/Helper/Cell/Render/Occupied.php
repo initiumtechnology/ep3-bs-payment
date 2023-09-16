@@ -12,10 +12,14 @@ class Occupied extends AbstractHelper
     {
         $view = $this->getView();
 
+        syslog(LOG_EMERG, print_r('Occupied', true));
+
+
         if ($user && $user->can('calendar.see-data')) {
             return $view->calendarCellRenderOccupiedForPrivileged($reservations, $cellLinkParams);
         } else if ($user) {
             if ($userBooking) {
+
                 $cellLabel = $view->t('Your Booking');
                 $cellGroup = ' cc-group-' . $userBooking->need('bid');
                 $style = 'cc-own';
