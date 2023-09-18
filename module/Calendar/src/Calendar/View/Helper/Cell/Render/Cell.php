@@ -11,26 +11,33 @@ class Cell extends AbstractHelper
 {
 
     private function arrays_match($array1, $array2) {
-        if (count($array1) !== count($array2)) {
-            return false; // If the arrays have different lengths, they can't match.
+        // Check if $array2 is an array and contains at least one item
+        if (!is_array($array2) || empty($array2)) {
+            return false; // $array2 should be a non-empty array.
         }
-    
-        foreach ($array1 as $key => $value) {
-            if (is_array($value)) {
-                // If the value is an array, compare it directly.
-                if ($value !== $array2[$key]) {
-                    return false; // If they don't match, return false.
-                }
-            } else {
-                // If the value is not an array, compare it directly.
-                if ($value !== $array2[$key]) {
-                    return false; // If they don't match, return false.
+
+        foreach ($array2 as $item) {
+            if (count($array1) !== count($item)) {
+                continue; // Skip items with different lengths.
+            }
+
+            $match = true; // Assume a match initially.
+
+            foreach ($array1 as $key => $value) {
+                if (!isset($item[$key]) || $value !== $item[$key]) {
+                    $match = false; // If any key or value doesn't match, set $match to false.
+                    break; // No need to continue checking this item.
                 }
             }
+
+            if ($match) {
+                return true; // If a match is found, return true.
+            }
         }
-    
-        return true; // If all elements match, return true.
+
+        return false; // No match found in $array2.
     }
+
 
     public function __construct(OptionManager $optionManager)
     {
@@ -161,14 +168,18 @@ class Cell extends AbstractHelper
         $cartService = Cart::getInstance();
         $cartItems = $cartService->getItems();
 
-
+        $cellLinkParamsCart = array();
         if (!empty($cartItems[0]['dateStart'])) {
-            $cellLinkParamsCart = ['query' => [
-                'ds' => $cartItems[0]['dateStart'],
-                'ts' => $cartItems[0]['timeStart'],
-                'te' => $cartItems[0]['timeEnd'],
-                's' => $cartItems[0]['square']
-                ]];
+            foreach ($cartItems as $item) {
+                $cellLinkParamsCart[] = array(
+                    'query' => array(
+                        'ds' => $item['dateStart'],
+                        'ts' => $item['timeStart'],
+                        'te' => $item['timeEnd'],
+                        's' => $item['square']
+                    )
+                    );
+            }
         }
         else {
             $cellLinkParamsCart = [];
@@ -181,7 +192,10 @@ class Cell extends AbstractHelper
             $match = false;
         }
 
-            //syslog(LOG_EMERG, print_r($reservationsForCell, true));
+            //syslog(LOG_EMERG, print_r($cellLinkParams, true));
+            //syslog(LOG_EMERG, print_r($cellLinkParamsCart11, true));
+            //syslog(LOG_EMERG, print_r('rega', true));
+
             //syslog(LOG_EMERG, print_r($cellLinkParamsCart, true));
 
             if ($cellFree && $match == false) {
@@ -192,23 +206,14 @@ class Cell extends AbstractHelper
                     return $view->calendarCellRenderFree($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);
                 }
             } else if ($match == false) {
-                //syslog(LOG_EMERG, print_r('Occupied cell', true));
-                //syslog(LOG_EMERG, print_r($cellLinkParams, true));
-                //syslog(LOG_EMERG, print_r('printing from proc', true));
                 return $view->calendarCellRenderOccupied($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);
             }
             else if ($match == true) {
-                syslog(LOG_EMERG, print_r('Cart cell', true));
+                //syslog(LOG_EMERG, print_r('Cart cell', true));
 
                 if (empty($cartItems[0]['dateStart'])) {
-                    syslog(LOG_EMERG, print_r('empty array', true));
+                    //syslog(LOG_EMERG, print_r('empty array', true));
                 } else {
-                        $cellLinkParamsCart = ['query' => [
-                            'ds' => $cartItems[0]['dateStart'],
-                            'ts' => $cartItems[0]['timeStart'],
-                            'te' => $cartItems[0]['timeEnd'],
-                            's' => $cartItems[0]['square'],
-                        ]];
                         //syslog(LOG_EMERG, print_r($cellLinkParamsCart, true));
                         return $view->CalendarCellRenderCart($user, $cellLinkParamsCart);
                     }
@@ -216,7 +221,5 @@ class Cell extends AbstractHelper
             }
 
         }
-
-
 
     }

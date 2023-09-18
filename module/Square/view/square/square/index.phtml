@@ -3,6 +3,10 @@
 $square = $this->square;
 $squareType = $this->option('subject.square.type');
 
+syslog(LOG_EMERG, print_r($square, true));
+syslog(LOG_EMERG, print_r($this->bookingsFromUser, true));
+
+
 $this->setup(array(
     'title' => sprintf('%s-%s', $squareType, $this->t('Details')),
     'panel' => 'centered-panel',
@@ -30,10 +34,12 @@ $this->setup(array(
         <?= $this->partial('square/square/index.own.phtml', $this->vars()) ?>
     <?php elseif ($this->bookable): ?>
         <?= $this->partial('square/square/index.free.phtml', $this->vars()) ?>
+    <?php elseif ($this->bookable): ?>
+        <?= $this->partial('user/account/cart.phtml', $this->vars()) ?>
     <?php else: ?>
         <?= $this->partial('square/square/index.occupied.phtml', $this->vars()) ?>
     <?php endif; ?>
-
+ 
     <?php
 
     if ($square->getMeta('info.post')) {
