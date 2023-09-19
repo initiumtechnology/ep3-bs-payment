@@ -34,7 +34,7 @@ return array_merge($project_config, array(
     'i18n' => array(
         'choice' => array(
             'en-US' => 'English',
-            'de-DE' => 'Deutsch'
+            'de-DE' => 'Deutsch',
 
             // More possible languages:
             // 'fr-FR' => 'Français',
@@ -68,7 +68,8 @@ return array_merge($project_config, array(
                 'payum.template.obtain_token' => '@PayumStripe/Action/stripe_js.html.twig',
                 'payum.template.require_confirmation' => '@PayumStripe/Action/stripe_confirm.html.twig'
             )),
-            'klarna_checkout' => (new \Payum\Klarna\Checkout\KlarnaCheckoutGatewayFactory())->create(array(
+            // replace below part with Omnipay 
+			'klarna_checkout' => (new \Payum\Klarna\Checkout\KlarnaCheckoutGatewayFactory())->create(array(
                 'secret' => '?',
                 'merchant_id' => '?',
                 'sandbox' => false
@@ -79,3 +80,4 @@ return array_merge($project_config, array(
         )
     ),
 ));
+

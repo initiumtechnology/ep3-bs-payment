@@ -5,7 +5,7 @@
  */
 
 
-$$instance = 'public';
+$instance = 'public';
 
 return array(
     // basepath of the instance on your server - i.e. tvas-booking-dev for https://tennis-rudolstadt.de/tvas-booking-dev or '' if you don't have a basepath square/ i.e. 
