@@ -12,8 +12,6 @@ class Reserved extends AbstractHelper
     {
         $view = $this->getView();
 
-        syslog(LOG_EMERG, print_r('Reserved', true));
-
 	    $labelReserved = $square->getMeta('label.reserved', $this->view->t('Reserved'));
 
         if ($user && $user->can('calendar.see-data, calendar.create-single-bookings, calendar.create-subscription-bookings')) {

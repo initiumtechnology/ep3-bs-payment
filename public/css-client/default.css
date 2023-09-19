@@ -14,8 +14,8 @@ a.cc-try:link,
 a.cc-try:visited { background-color: #e5e68b; }
 a.cc-try:hover { background-color: #e5e68b; }
 
-a.cc-cart:link,
-a.cc-cart:visited { background-color: #18d718; }
+a.cc-cart:link  {background: darkcyan; color:white }
+a.cc-cart:visited { background-color: #18d718;}
 a.cc-cart:hover { background-color: #18d718; }
 
 a.cc-single:link,
