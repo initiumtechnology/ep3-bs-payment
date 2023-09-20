@@ -215,7 +215,7 @@ class Cell extends AbstractHelper
                     //syslog(LOG_EMERG, print_r('empty array', true));
                 } else {
                         //syslog(LOG_EMERG, print_r($cellLinkParamsCart, true));
-                        return $view->CalendarCellRenderCart($user, $cellLinkParamsCart);
+                        return $view->CalendarCellRenderCart($user, $cellLinkParams);
                     }
 
             }
