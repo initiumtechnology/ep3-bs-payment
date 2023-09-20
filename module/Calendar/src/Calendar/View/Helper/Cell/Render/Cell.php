@@ -28,6 +28,34 @@ class Cell extends AbstractHelper
         return false; // No match found in $array2.
     }
 
+    public function splitElementsIfTimeDifferenceExceeds($array, $maxTimeDifferenceMinutes = 30) {
+        $result = [];
+    
+        foreach ($array as $element) {
+            $startTime = strtotime($element['query']['ts']);
+            $endTime = strtotime($element['query']['te']);
+    
+            $timeDifferenceMinutes = ($endTime - $startTime) / 60;
+    
+            if ($timeDifferenceMinutes > $maxTimeDifferenceMinutes) {
+                // Split the element into multiple elements with 30-minute intervals
+                $currentTime = $startTime;
+                while ($currentTime < $endTime) {
+                    $newElement = $element;
+                    $newElement['query']['te'] = date('H:i', strtotime('+30 minutes', $currentTime));
+                    $newElement['query']['ts'] = date('H:i', $currentTime);
+                    $newElement['query']['ds'] = date('Y-m-d', strtotime($element['query']['ds'])); // Convert 'ds' date format
+                    $result[] = $newElement;
+                    $currentTime = strtotime('+30 minutes', $currentTime);
+                }
+            } else {
+                $element['query']['ds'] = date('Y-m-d', strtotime($element['query']['ds'])); // Convert 'ds' date format
+                $result[] = $element;
+            }
+        }
+    
+        return $result;
+    }
 
     public function __construct(OptionManager $optionManager)
     {
@@ -159,7 +187,7 @@ class Cell extends AbstractHelper
         $cartItems = $cartService->getItems();
 
         $cellLinkParamsCart = array();
-        if (!empty($cartItems[0]['dateStart'])) {
+        if (!empty($cartItems)) {
             foreach ($cartItems as $item) {
                 $cellLinkParamsCart[] = array(
                     'query' => array(
@@ -175,12 +203,25 @@ class Cell extends AbstractHelper
             $cellLinkParamsCart = [];
         }
 
+        
+        // syslog(LOG_EMERG, print_r($cellLinkParamsCart, true));
+        // syslog(LOG_EMERG, print_r($this->splitElementsIfTimeDifferenceExceeds($cellLinkParamsCart, $maxTimeDifferenceMinutes = 30), true));
 
-        if ($this->arrays_match($cellLinkParams, $cellLinkParamsCart)) {
+        if ($this->arrays_match($cellLinkParams, $this->splitElementsIfTimeDifferenceExceeds($cellLinkParamsCart, $maxTimeDifferenceMinutes = 30)))
+        {
             $match = true;
         } else {
             $match = false;
+
         }
+
+        // syslog(LOG_EMERG, print_r($cellLinkParamsCart, true));
+        // syslog(LOG_EMERG, print_r($this->splitElementsIfTimeDifferenceExceeds($cellLinkParamsCart, $maxTimeDifferenceMinutes = 30), true));
+        // syslog(LOG_EMERG, print_r($cellLinkParams['query'], true));
+        // syslog(LOG_EMERG, print_r($matcha, true));
+       // syslog(LOG_EMERG, print_r($cartItems, true));
+
+
 
             if ($cellFree && $match == false) {
                 //syslog(LOG_EMERG, print_r('Free cell', true));
@@ -198,7 +239,7 @@ class Cell extends AbstractHelper
                 if (empty($cartItems[0]['dateStart'])) {
                     //syslog(LOG_EMERG, print_r('empty array', true));
                 } else {
-                        //syslog(LOG_EMERG, print_r($cellLinkParamsCart, true));
+
                         return $view->CalendarCellRenderCart($user, $cellLinkParams);
                     }
 
