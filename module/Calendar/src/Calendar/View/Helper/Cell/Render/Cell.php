@@ -10,28 +10,18 @@ use \Square\Factory\Cart;
 class Cell extends AbstractHelper
 {
 
-    private function arrays_match($array1, $array2) {
-        // Check if $array2 is an array and contains at least one item
+    public function arrays_match($array1, $array2) {
         if (!is_array($array2) || empty($array2)) {
             return false; // $array2 should be a non-empty array.
         }
 
-        foreach ($array2 as $item) {
-            if (count($array1) !== count($item)) {
-                continue; // Skip items with different lengths.
-            }
+        // Get the only element from $array1
+        $element1 = reset($array1);
 
-            $match = true; // Assume a match initially.
-
-            foreach ($array1 as $key => $value) {
-                if (!isset($item[$key]) || $value !== $item[$key]) {
-                    $match = false; // If any key or value doesn't match, set $match to false.
-                    break; // No need to continue checking this item.
-                }
-            }
-
-            if ($match) {
-                return true; // If a match is found, return true.
+        // Check if $element1 exists in any element of $array2
+        foreach ($array2 as $element2) {
+            if ($element1 == $element2['query']) {
+                return true;
             }
         }
 
@@ -191,12 +181,6 @@ class Cell extends AbstractHelper
         } else {
             $match = false;
         }
-
-            //syslog(LOG_EMERG, print_r($cellLinkParams, true));
-            //syslog(LOG_EMERG, print_r($cellLinkParamsCart11, true));
-            //syslog(LOG_EMERG, print_r('rega', true));
-
-            //syslog(LOG_EMERG, print_r($cellLinkParamsCart, true));
 
             if ($cellFree && $match == false) {
                 //syslog(LOG_EMERG, print_r('Free cell', true));
