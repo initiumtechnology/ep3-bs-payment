@@ -18,6 +18,7 @@ use Payum\Stripe\Request\Confirm;
 use Stripe;
 use GuzzleHttp\Client; 
 use \Square\Factory\Cart;
+use DateTime;
 
 class BookingController extends AbstractActionController
 {
@@ -174,12 +175,25 @@ class BookingController extends AbstractActionController
         $cartItems = $cartService->getItems();
         $itemExists = false;
 
+        $bookingStartTime = new DateTime($bookingInfo['start']);
+        $bookingEndTime = new DateTime($bookingInfo['end']);
+
+        syslog(LOG_EMERG, $bookingInfo['start']);
+        syslog(LOG_EMERG, $byproducts['dateStart']);
+
         foreach ($cartItems as $cartItem) {
-            if ($cartItem['square'] === $bookingInfo['square'] &&
-                $cartItem['start'] === $bookingInfo['start'] &&
-                $cartItem['end'] === $bookingInfo['end']) {
-                $itemExists = true;
-                break;
+            if ($cartItem['square'] === $bookingInfo['square']) {
+                // Check for time overlap
+                $cartStartTime = new DateTime($cartItem['start']);
+                $cartEndTime = new DateTime($cartItem['end']);
+
+                if (($bookingStartTime >= $cartStartTime && $bookingStartTime < $cartEndTime) ||
+                    ($bookingEndTime > $cartStartTime && $bookingEndTime <= $cartEndTime) ||
+                    ($bookingStartTime <= $cartStartTime && $bookingEndTime >= $cartEndTime)) {
+                    // There is a time overlap, set $itemExists to true
+                    $itemExists = true;
+                    break;
+                }
             }
         }
 
