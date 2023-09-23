@@ -13,10 +13,10 @@ class CartFill extends AbstractHelper
     {
         $view = $this->getView();
 
-     if ($user) {
-                 $cellLabel = $view->t('Cart');
-                 $style = 'cc-cart';
-                return $view->calendarCellLink($cellLabel, $view->url('square', [], $cellLinkParams), $style);
-
-            }
-     }}
+        if ($user) {
+            $cellLabel = $view->t('Cart');
+            $style = 'cc-cart';
+            return $view->calendarCellLink($cellLabel, $view->url('user/cart'), $style);
+        }
+    }
+}
