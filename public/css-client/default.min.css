@@ -20,9 +20,7 @@ a.cc-own:hover {
   background-color: #5f8024;
 }
 
-a.cc-cart:link  {background: darkcyan; color:white }
-a.cc-cart:visited { background-color: #18d718;}
-
+a.cc-cart:link  {background-color: darkcyan; color:white }
 
 a.cc-try:link,
 a.cc-try:visited {
