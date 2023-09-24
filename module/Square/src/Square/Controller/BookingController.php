@@ -232,19 +232,19 @@ class BookingController extends AbstractActionController
         // Get the current datetime
         $current_datetime = date('Y-m-d H:i:s'); // Format it as 'YYYY-MM-DD HH:MM:SS'
 
-        // Iterate through the $cartItem array and remove items where "start" time is before the current datetime
-        foreach ($cartItems as $key => $item) {
-            $start_time = $item['start'];
-            if ($start_time < $current_datetime) {
-                unset($cartItems[$key]);
-            }
-        }
+        // // Iterate through the $cartItem array and remove items where "start" time is before the current datetime
+        // foreach ($cartItems as $key => $item) {
+        //     $start_time = $item['start'];
+        //     if ($start_time < $current_datetime) {
+        //         unset($cartItems[$key]);
+        //     }
+        // }
 
-        // Re-index the array if needed
-        $cartItems = array_values($cartItems);
+        // // Re-index the array if needed
+        // $cartItems = array_values($cartItems);
 
-        syslog(LOG_EMERG, 'printing cart in checkout action');
-        syslog(LOG_EMERG, json_encode($cartItems));
+        // syslog(LOG_EMERG, 'printing cart in checkout action');
+        // syslog(LOG_EMERG, json_encode($cartItems));
 
         // Check if the user is a member
         $member = 0;
@@ -257,29 +257,36 @@ class BookingController extends AbstractActionController
         $allAvailable = True;
         $total = 0;
 
-
         // Check if each square still available
         $squareValidator = $serviceManager->get('Square\Service\SquareValidator');
         $squarePricingManager = $serviceManager->get('Square\Manager\SquarePricingManager');
         foreach ($cartItems as &$cartItem) {
-            $byproducts = $squareValidator->isBookable($cartItem['dateStart'], $cartItem['dateEnd'], $cartItem['timeStart'], $cartItem['timeEnd'], $cartItem['square']);
 
+            $is_bookable = false;
+
+            try {
+                $byproducts = $squareValidator->isBookable($cartItem['dateStart'], $cartItem['dateEnd'], $cartItem['timeStart'], $cartItem['timeEnd'], $cartItem['square']);
+                $is_bookable = $byproducts['bookable'];
+            } catch (RuntimeException $e) {
+                $is_bookable = false;
+            }
+            
             // If the booking is no longer available
-            if (! $byproducts['bookable']) {
+            if (! $is_bookable) {
                 $this->flashMessenger()->addErrorMessage(sprintf($this->t('%sThe booking is no longer available!%s'),
                        '<b>', '</b>'));
                 $allAvailable = False;
             } else {
+                // Get square and user info
+                $finalPrice = $squarePricingManager->getFinalPricingInRange($byproducts['dateStart'], $byproducts['dateEnd'], $byproducts['square'], 1, $member);
+                $total += $finalPrice['price'];
+
+                // Store price
+                $cartItem['price'] = $finalPrice['price'];
+
                 // Add to updated cart
                 $updatedCartItems[] = $cartItem;
             }
-
-            // Get square and user info
-            $finalPrice = $squarePricingManager->getFinalPricingInRange($byproducts['dateStart'], $byproducts['dateEnd'], $byproducts['square'], 1, $member);
-            $total += $finalPrice['price'];
-
-            // Store price
-            $cartItem['price'] = $finalPrice['price'];
         }
 
         // printing byproducts
@@ -381,6 +388,7 @@ class BookingController extends AbstractActionController
 
             // iterate through each square and setup a booking
             $bookings = array();
+            $booking_str = "";
             
             foreach ($cartItems as &$cartItem) {
                 // get square
@@ -413,10 +421,11 @@ class BookingController extends AbstractActionController
                 syslog(LOG_EMERG, json_encode($meta));
                 syslog(LOG_EMERG, 'printing data to create booking - end');
 
-
                 // Create booking and add to list
                 $bookings[] = array('b' => $bookingService->createSingle($user, $square, 1, $byproducts['dateStart'], $byproducts['dateEnd'], $bills, $meta),
                                     'p' => $cartItem['price']);
+
+                $booking_str = $booking_str . 'Court ' . $square->get("name") . ' ' . $byproducts['dateStart']->format('Y-m-d H:i:s') . ' - ' . $byproducts['dateEnd']->format('Y-m-d H:i:s') . "<br>";
             }
 
             syslog(LOG_EMERG, 'printing bookings');
@@ -486,7 +495,7 @@ class BookingController extends AbstractActionController
                        $model["currency"] = 'AUD';
                        $model["description"] = $description;
                        $model["receipt_email"] = $user->get('email');
-                       $model["metadata"] = array('bid' => $booking->get('bid'), 'productName' => $this->option('subject.type'), 'locale' => $locale, 'instance' => $basepath, 'projectShort' => $projectShort, 'userName' => $userName, 'companyName' => $companyName, 'stripeDefaultPaymentMethod' => $this->config('stripeDefaultPaymentMethod'), 'stripeAutoConfirm' => var_export($this->config('stripeAutoConfirm'), true), 'stripePaymentRequest' => var_export($this->config('stripePaymentRequest'), true));
+                       $model["metadata"] = array('bid' => $booking->get('bid'), 'productName' => $booking_str, 'locale' => $locale, 'instance' => $basepath, 'projectShort' => $projectShort, 'userName' => $userName, 'companyName' => $companyName, 'stripeDefaultPaymentMethod' => $this->config('stripeDefaultPaymentMethod'), 'stripeAutoConfirm' => var_export($this->config('stripeAutoConfirm'), true), 'stripePaymentRequest' => var_export($this->config('stripePaymentRequest'), true));
                        $storage->update($model);
                        $captureToken = $this->getServiceLocator()->get('payum.security.token_factory')->createCaptureToken(
                            'stripe', $model, $proxyurl.$basepath.'/square/booking/payment/confirm');
