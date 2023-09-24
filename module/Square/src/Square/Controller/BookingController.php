@@ -263,7 +263,6 @@ class BookingController extends AbstractActionController
         foreach ($cartItems as &$cartItem) {
 
             $is_bookable = false;
-
             try {
                 $byproducts = $squareValidator->isBookable($cartItem['dateStart'], $cartItem['dateEnd'], $cartItem['timeStart'], $cartItem['timeEnd'], $cartItem['square']);
                 $is_bookable = $byproducts['bookable'];
@@ -273,7 +272,7 @@ class BookingController extends AbstractActionController
             
             // If the booking is no longer available
             if (! $is_bookable) {
-                $this->flashMessenger()->addErrorMessage(sprintf($this->t('%sThe booking is no longer available!%s'),
+                $this->flashMessenger()->addErrorMessage(sprintf($this->t('%sA booking is no longer available!%s'),
                        '<b>', '</b>'));
                 $allAvailable = False;
             } else {
