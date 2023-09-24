@@ -62,6 +62,9 @@ class CartController extends AbstractActionController
             }
         }
 
+        // Update the cart with the available items
+        $cartService->setItems($updatedCartItems);
+
         // Return to view
         $viewModel = new ViewModel([
             'cartItems' => $updatedCartItems,
