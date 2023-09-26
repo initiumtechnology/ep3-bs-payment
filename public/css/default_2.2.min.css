@@ -783,6 +783,11 @@ a.white:hover {
     background-image: url(../imgs/icons/booking.png)
 }
 
+.symbolic-cart {
+    padding-left: 20px;
+    background-image: url(../imgs/icons/cart.png)
+}
+
 .symbolic-date {
     padding-left: 20px;
     background-image: url(../imgs/icons/calendar.png)
