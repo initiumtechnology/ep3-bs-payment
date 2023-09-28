@@ -5,6 +5,8 @@ namespace User\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use \Square\Factory\Cart;
+use Exception;
+use RuntimeException;
 
 use Zend\Session\Container;
 
@@ -38,6 +40,7 @@ class CartController extends AbstractActionController
             // Check if the square is still available
             $is_bookable = false;
             try {
+                // syslog(LOG_EMERG, json_encode($cartItems));
                 $byproducts = $squareValidator->isBookable($cartItem['dateStart'], $cartItem['dateEnd'], $cartItem['timeStart'], $cartItem['timeEnd'], $cartItem['square']);
                 $is_bookable = $byproducts['bookable'];
             } catch (RuntimeException $e) {
