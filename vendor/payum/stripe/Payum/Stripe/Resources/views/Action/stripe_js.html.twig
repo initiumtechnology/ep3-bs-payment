@@ -123,7 +123,7 @@
     <div class="line-item">
         <img class="image" src="{{ model.metadata.instance }}/imgs-client/layout/tennis-court.png" alt="square" id="logo">
         <div class="label">
-          <p class="product">{{ model.metadata.productName }}</p>
+          <p class="product">{{ model.metadata.productName|raw }}</p>
           <p class="sku"></p>
         </div>
         <p class="count">{{ model.quantity|default(1) }}</p>

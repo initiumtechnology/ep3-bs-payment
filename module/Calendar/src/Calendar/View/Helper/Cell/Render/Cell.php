@@ -223,28 +223,25 @@ class Cell extends AbstractHelper
 
 
 
-            if ($cellFree && $match == false) {
-                //syslog(LOG_EMERG, print_r('Free cell', true));
-                if ($cellReserved && $displayClubExceptions && ($user && !$user->getMeta('member'))) {
-                    return $view->calendarCellRenderReserved($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);   
-                } else {
-                    return $view->calendarCellRenderFree($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);
-                }
-            } else if ($match == false) {
-                return $view->calendarCellRenderOccupied($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);
+        if ($cellFree && $match == false) {
+            //syslog(LOG_EMERG, print_r('Free cell', true));
+            if ($cellReserved && $displayClubExceptions && ($user && !$user->getMeta('member'))) {
+                return $view->calendarCellRenderReserved($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);   
+            } else {
+                return $view->calendarCellRenderFree($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);
             }
-            else if ($match == true) {
-                //syslog(LOG_EMERG, print_r('Cart cell', true));
+        } else if ($match == false) {
+            return $view->calendarCellRenderOccupied($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);
+        } else if ($match == true) {
+            //syslog(LOG_EMERG, print_r('Cart cell', true));
 
-                if (empty($cartItems[0]['dateStart'])) {
-                    //syslog(LOG_EMERG, print_r('empty array', true));
-                } else {
-
-                        return $view->CalendarCellRenderCart($user, $cellLinkParams);
-                    }
-
-            }
-
+            // if (empty($cartItems[0]['dateStart'])) {
+            //     syslog(LOG_EMERG, print_r('empty array', true));
+            // } else {
+                    return $view->CalendarCellRenderCart($user, $cellLinkParams);
+            // }
         }
 
     }
+
+}

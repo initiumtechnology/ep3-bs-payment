@@ -29,20 +29,45 @@ class CartController extends AbstractActionController
         // Get the manager instances
         $squareManager = $this->getServiceLocator()->get('Square\Manager\SquareManager');
         $squarePricingManager = $this->getServiceLocator()->get('Square\Manager\SquarePricingManager');
+        $squareValidator = $this->getServiceLocator()->get('Square\Service\SquareValidator');
+
+        // Create an array to store items that are still available
+        $updatedCartItems = [];
         
         foreach ($cartItems as &$cartItem) {
-            $square = $squareManager->get($cartItem['square']);
-            $dateStart = $this->convertToDateTime($cartItem['start']);
-            $dateEnd = $this->convertToDateTime($cartItem['end']);
+            // Check if the square is still available
+            $is_bookable = false;
+            try {
+                $byproducts = $squareValidator->isBookable($cartItem['dateStart'], $cartItem['dateEnd'], $cartItem['timeStart'], $cartItem['timeEnd'], $cartItem['square']);
+                $is_bookable = $byproducts['bookable'];
+            } catch (RuntimeException $e) {
+                $is_bookable = false;
+            }
 
-            $price = $squarePricingManager->getFinalPricingInRange($dateStart, $dateEnd, $square, 1, $member);
-            $cartItem['squareName'] = $square->get('name');
-            $cartItem['price'] = $price['price'];
+            // If the booking is no longer available
+            if (! $is_bookable) {
+                $this->flashMessenger()->addErrorMessage(sprintf($this->t('%sA booking is no longer available!%s'),
+                        '<b>', '</b>'));
+            } else {
+                // Get square name and price
+                $square = $squareManager->get($cartItem['square']);
+                $finalPrice = $squarePricingManager->getFinalPricingInRange($byproducts['dateStart'], $byproducts['dateEnd'], $byproducts['square'], 1, $member);
+
+                // Store name and price
+                $cartItem['squareName'] = $square->get('name');
+                $cartItem['price'] = $finalPrice['price'];
+
+                // Add to updated cart
+                $updatedCartItems[] = $cartItem;
+            }
         }
+
+        // Update the cart with the available items
+        $cartService->setItems($updatedCartItems);
 
         // Return to view
         $viewModel = new ViewModel([
-            'cartItems' => $cartItems,
+            'cartItems' => $updatedCartItems,
         ]);
 
         // Set the view template

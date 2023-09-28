@@ -453,6 +453,7 @@ a.squarebox-primary-close-link:hover {
 .symbolic-cross { padding-left: 22px; background-image: url(../imgs/icons/cross.png); }
 .symbolic-user { padding-left: 19px; background-image: url(../imgs/icons/user.png); }
 .symbolic-booking { padding-left: 21px; background-image: url(../imgs/icons/booking.png); }
+.symbolic-cart { padding-left: 21px; background-image: url(../imgs/icons/cart.png);}
 .symbolic-date { padding-left: 20px; background-image: url(../imgs/icons/calendar.png); }
 .symbolic-warning { padding-left: 22px; background-image: url(../imgs/icons/warning.png); }
 .symbolic-attachment { padding-left: 22px; background-image: url(../imgs/icons/attachment.png); }
