@@ -4,9 +4,58 @@ namespace Calendar\View\Helper\Cell\Render;
 
 use Zend\View\Helper\AbstractHelper;
 use Base\Manager\OptionManager;
+use \Square\Factory\Cart;
+
 
 class Cell extends AbstractHelper
 {
+
+    public function arrays_match($array1, $array2) {
+        if (!is_array($array2) || empty($array2)) {
+            return false; // $array2 should be a non-empty array.
+        }
+
+        // Get the only element from $array1
+        $element1 = reset($array1);
+
+        // Check if $element1 exists in any element of $array2
+        foreach ($array2 as $element2) {
+            if ($element1 == $element2['query']) {
+                return true;
+            }
+        }
+
+        return false; // No match found in $array2.
+    }
+
+    public function splitElementsIfTimeDifferenceExceeds($array, $maxTimeDifferenceMinutes = 30) {
+        $result = [];
+    
+        foreach ($array as $element) {
+            $startTime = strtotime($element['query']['ts']);
+            $endTime = strtotime($element['query']['te']);
+    
+            $timeDifferenceMinutes = ($endTime - $startTime) / 60;
+    
+            if ($timeDifferenceMinutes > $maxTimeDifferenceMinutes) {
+                // Split the element into multiple elements with 30-minute intervals
+                $currentTime = $startTime;
+                while ($currentTime < $endTime) {
+                    $newElement = $element;
+                    $newElement['query']['te'] = date('H:i', strtotime('+30 minutes', $currentTime));
+                    $newElement['query']['ts'] = date('H:i', $currentTime);
+                    $newElement['query']['ds'] = date('Y-m-d', strtotime($element['query']['ds'])); // Convert 'ds' date format
+                    $result[] = $newElement;
+                    $currentTime = strtotime('+30 minutes', $currentTime);
+                }
+            } else {
+                $element['query']['ds'] = date('Y-m-d', strtotime($element['query']['ds'])); // Convert 'ds' date format
+                $result[] = $element;
+            }
+        }
+    
+        return $result;
+    }
 
     public function __construct(OptionManager $optionManager)
     {
@@ -23,6 +72,7 @@ class Cell extends AbstractHelper
             'te' => gmdate('H:i', $walkingTime + $timeBlock),
             's' => $square->need('sid'),
         ]];
+
 
         if ($cellLinkParams['query']['te'] == '00:00') {
             $cellLinkParams['query']['te'] = '24:00';
@@ -115,7 +165,7 @@ class Cell extends AbstractHelper
                     $timeEnd = clone $walkingDate;
                     $timeBlockMinutes = $timeBlock/60;
                     $timeEnd = $timeEnd->modify("+{$timeBlockMinutes} minutes");
-                    
+
                     $resTimeStartParam = $square->getMeta('club_reserved_time_start');
                     $resTimeEndParam = $square->getMeta('club_reserved_time_end');
                     $resTimeStartParts = explode(':', $resTimeStartParam);
@@ -133,15 +183,53 @@ class Cell extends AbstractHelper
             }
         }
 
-        if ($cellFree) {
+        $cartService = Cart::getInstance();
+        $cartItems = $cartService->getItems();
+
+        $cellLinkParamsCart = array();
+        if (!empty($cartItems)) {
+            foreach ($cartItems as $item) {
+                $cellLinkParamsCart[] = array(
+                    'query' => array(
+                        'ds' => $item['dateStart'],
+                        'ts' => $item['timeStart'],
+                        'te' => $item['timeEnd'],
+                        's' => $item['square']
+                    )
+                    );
+            }
+        }
+        else {
+            $cellLinkParamsCart = [];
+        }
+
+        if ($this->arrays_match($cellLinkParams, $this->splitElementsIfTimeDifferenceExceeds($cellLinkParamsCart, $maxTimeDifferenceMinutes = 30)))
+        {
+            $match = true;
+        } else {
+            $match = false;
+
+        }
+
+        if ($cellFree && $match == false) {
+            //syslog(LOG_EMERG, print_r('Free cell', true));
             if ($cellReserved && $displayClubExceptions && ($user && !$user->getMeta('member'))) {
                 return $view->calendarCellRenderReserved($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);   
-            } else {             
+            } else {
                 return $view->calendarCellRenderFree($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);
-            }    
-        } else {
+            }
+        } else if ($match == false) {
             return $view->calendarCellRenderOccupied($user, $userBooking, $reservationsForCell, $cellLinkParams, $square);
+        } else if ($match == true) {
+            //syslog(LOG_EMERG, print_r('Cart cell', true));
+
+            // if (empty($cartItems[0]['dateStart'])) {
+            //     syslog(LOG_EMERG, print_r('empty array', true));
+            // } else {
+                    return $view->CalendarCellRenderCart($user, $cellLinkParams);
+            // }
         }
+
     }
 
 }

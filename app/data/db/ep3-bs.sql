@@ -33,7 +33,7 @@ CREATE TABLE `bs_bookings` (
   `uid` int(10) UNSIGNED NOT NULL,
   `sid` int(10) UNSIGNED NOT NULL,
   `status` varchar(64) NOT NULL COMMENT 'single|subscription|cancelled',
-  `status_billing` varchar(64) NOT NULL COMMENT 'pending|paid|cancelled|uncollectable',
+  `status_billing` varchar(64) NOT NULL COMMENT 'pending|paid|cancelled|uncollectable|regular',
   `visibility` varchar(64) NOT NULL COMMENT 'public|private',
   `quantity` int(10) UNSIGNED NOT NULL,
   `created` datetime NOT NULL
@@ -79,9 +79,7 @@ INSERT INTO `bs_bookings` (`bid`, `uid`, `sid`, `status`, `status_billing`, `vis
 (71, 28, 9, 'subscription', 'paid', 'public', 1, '2023-06-07 20:32:32'),
 (72, 25, 5, 'subscription', 'paid', 'public', 1, '2023-06-07 20:32:51'),
 (73, 25, 6, 'subscription', 'paid', 'public', 1, '2023-06-07 20:33:12'),
-(74, 25, 7, 'subscription', 'paid', 'public', 1, '2023-06-07 20:33:30'),
-(75, 4, 6, 'cancelled', 'pending', 'public', 1, '2023-06-07 20:41:55'),
-(76, 4, 5, 'single', 'pending', 'public', 1, '2023-06-07 21:00:22');
+(74, 25, 7, 'subscription', 'paid', 'public', 1, '2023-06-07 20:33:30');
 
 -- --------------------------------------------------------
 
@@ -102,7 +100,7 @@ CREATE TABLE `bs_bookings_bills` (
 
 --
 -- Dumping data for table `bs_bookings_bills`
---
+-- need to look into bs_booking_bills @charlotte 13/8
 
 INSERT INTO `bs_bookings_bills` (`bbid`, `bid`, `description`, `quantity`, `time`, `price`, `rate`, `gross`) VALUES
 (5, 16, 'Square D, Jun 2, 2023, 11:00 AM to 11:30 AM', 1, 1800, 1000, 19, 1),
@@ -455,7 +453,7 @@ INSERT INTO `bs_options` (`oid`, `key`, `value`, `locale`) VALUES
 (23, 'service.branding.name', 'ep-3 Bookingsystem', NULL),
 (24, 'service.branding.website', 'http://bs.hbsys.de/', NULL),
 (25, 'service.pricing.visibility', 'public', NULL),
-(26, 'service.status-values.billing', 'Pending (pending)\r\nPaid (paid)\r\nCancelled (cancelled)\r\nUncollectable (uncollectable)', 'en-US'),
+(26, 'service.status-values.billing', 'Pending (pending)\r\nPaid (paid)\r\nCancelled (cancelled)\r\nUncollectable (uncollectable)\r\nRegular (regular) #ffa500', 'en-US'),
 (27, 'client.contact.email.user-notifications', '1', 'en-US'),
 (28, 'service.maintenance', 'false', NULL),
 (29, 'service.calendar.display-club-exceptions', '0', NULL),
@@ -2454,7 +2452,15 @@ INSERT INTO `bs_squares` (`sid`, `name`, `status`, `priority`, `capacity`, `capa
 (7, '6', 'enabled', 6, 1, 0, 0, '10:00:00', '23:00:00', 1800, 1800, 180000, 0, 2592000, 0, 86400),
 (8, '7', 'enabled', 7, 1, 0, 0, '10:00:00', '23:00:00', 1800, 1800, 180000, 0, 2592000, 0, 86400),
 (9, '8', 'enabled', 8, 1, 0, 0, '10:00:00', '23:00:00', 1800, 1800, 180000, 0, 2592000, 0, 86400),
-(10, '9', 'enabled', 9, 1, 0, 0, '10:00:00', '23:00:00', 1800, 1800, 180000, 0, 2592000, 0, 86400);
+(10, '9', 'enabled', 9, 1, 0, 0, '10:00:00', '23:00:00', 1800, 1800, 180000, 0, 2592000, 0, 86400),
+(11, 'TBL 1', 'enabled', 10, 1, 0, 0, '10:00:00', '23:00:00', 1800, 1800, 180000, 0, 2592000, 0, 86400),
+(12, 'TBL 2', 'enabled', 10, 1, 0, 0, '10:00:00', '23:00:00', 1800, 1800, 180000, 0, 2592000, 0, 86400),
+(13, 'TBL 3', 'enabled', 10, 1, 0, 0, '10:00:00', '23:00:00', 1800, 1800, 180000, 0, 2592000, 0, 86400),
+(14, 'TBL 4', 'enabled', 10, 1, 0, 0, '10:00:00', '23:00:00', 1800, 1800, 180000, 0, 2592000, 0, 86400),
+(15, 'TBL 5', 'enabled', 10, 1, 0, 0, '10:00:00', '23:00:00', 1800, 1800, 180000, 0, 2592000, 0, 86400),
+(16, 'TBL 6', 'enabled', 10, 1, 0, 0, '10:00:00', '23:00:00', 1800, 1800, 180000, 0, 2592000, 0, 86400),
+(17, 'TBL 7', 'enabled', 10, 1, 0, 0, '10:00:00', '23:00:00', 1800, 1800, 180000, 0, 2592000, 0, 86400),
+(18, 'TBL 8', 'enabled', 10, 1, 0, 0, '10:00:00', '23:00:00', 1800, 1800, 180000, 0, 2592000, 0, 86400);
 
 -- --------------------------------------------------------
 

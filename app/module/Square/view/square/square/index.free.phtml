@@ -23,7 +23,7 @@ if ($square->need('status') == 'readonly') {
         if ($square->need('capacity') > 1 || $this->products) {
             $route = 'square/booking/customization';
         } else {
-            $route = 'square/booking/confirmation';
+            $route = 'square/booking/addtocart';
         }
 
         $url = $this->url($route, [], ['query' => [
@@ -34,7 +34,7 @@ if ($square->need('status') == 'readonly') {
             's' => $square->need('sid')]]);
 
         echo sprintf('<a href="%s" id="sb-button" class="default-button squarebox-internal-link"><span class="symbolic symbolic-plus">%s</span></a>',
-            $url, $this->t('Book now'));
+            $url, $this->t('Add this court to Cart'));
 
         echo '</p>';
     } else {

@@ -33,6 +33,24 @@ return array(
                                     ),
                                 ),
                             ),
+                            'addtocart' => array(
+                                'type' => 'Literal',
+                                'options' => array(
+                                    'route' => '/addtocart',
+                                    'defaults' => array(
+                                        'action' => 'addtocart',
+                                    ),
+                                ),
+                            ),
+                            'checkout' => array(
+                                'type' => 'Literal',
+                                'options' => array(
+                                    'route' => '/checkout',
+                                    'defaults' => array(
+                                        'action' => 'checkout',
+                                    ),
+                                ),
+                            ),
                             'confirmation' => array(
                                 'type' => 'Literal',
                                 'options' => array(
@@ -105,6 +123,7 @@ return array(
 
             'Square\Table\SquarePricingTable' => 'Square\Table\SquarePricingTableFactory',
             'Square\Table\SquareProductTable' => 'Square\Table\SquareProductTableFactory',
+            'Square\Factory\Cart' => 'Square\Factory\CartFactory'
         ),
     ),
 

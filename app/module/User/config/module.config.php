@@ -116,6 +116,31 @@ return array(
                             ),
                         ),
                     ),
+                    'cart' => array(
+                        'type' => 'Literal',
+                        'options' => array(
+                            'route' => '/cart',
+                            'defaults' => array(
+                                'controller' => 'User\Controller\Cart',
+                                'action' => 'get',
+                            ),
+                        ),
+                        'may_terminate' => true,
+                        'child_routes' => array(
+                            'remove-item' => array(
+                                'type' => 'Segment',
+                                'options' => array(
+                                    'route' => '/remove-item/:index',
+                                    'defaults' => array(
+                                        'action' => 'removeItem',
+                                    ),
+                                    'constraints' => array(
+                                        'index' => '\d+',
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
                     'settings' => array(
                         'type' => 'Literal',
                         'options' => array(
@@ -135,6 +160,7 @@ return array(
         'invokables' => array(
             'User\Controller\Session' => 'User\Controller\SessionController',
             'User\Controller\Account' => 'User\Controller\AccountController',
+            'User\Controller\Cart' => 'User\Controller\CartController',
         ),
     ),
 

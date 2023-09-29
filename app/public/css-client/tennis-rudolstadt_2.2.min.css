@@ -165,6 +165,7 @@ body.tennis-rudolstadt>div.panel:first-child {
     }
 
     .tennis-rudolstadt #calendar-toolbar-userpanel .symbolic-booking::before,
+    .tennis-rudolstadt #calendar-toolbar-userpanel .symbolic-cart::before,
     .tennis-rudolstadt #calendar-toolbar-userpanel .symbolic-user::before,
     .tennis-rudolstadt #calendar-toolbar-userpanel .symbolic-off::before {
         content: " "
@@ -174,8 +175,12 @@ body.tennis-rudolstadt>div.panel:first-child {
         padding-left: 12px
     }
 
+    .tennis-rudolstadt #calendar-toolbar-userpanel .symbolic-cart {
+        padding-left: 13px
+    }
+
     .tennis-rudolstadt #calendar-toolbar-userpanel .symbolic-user {
-        padding-left: 10px
+        padding-left: 12px
     }
 
     .tennis-rudolstadt #calendar-toolbar-userpanel .symbolic-off {

@@ -11,11 +11,11 @@ $project_config = require 'config/autoload/project.php';
 
 return array_merge($project_config, array(
     'db' => array(
-        'database' => 'ep3bs',
-        'username' => 'ep3bs',
-        'password' => 'PuLf648YbAGq7B2m8H',
+        'database' => 'ep3-charlotte',
+        'username' => 'root',
+        'password' => 'root',
 
-        'hostname' => 'db',
+        'hostname' => 'localhost',
         'port' => 3306,
     ),
     'mail' => array(

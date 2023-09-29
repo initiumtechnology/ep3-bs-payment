@@ -441,6 +441,15 @@ a.cc-own:hover {
     background-color: #5f8024
 }
 
+a.cc-cart:link {
+    color: #FFF;
+
+}
+
+a.cc-cart:visited {
+    color: #FFF;
+}
+
 a.cc-single:link,
 a.cc-single:visited {
     opacity: 1.0;
@@ -772,6 +781,11 @@ a.white:hover {
 .symbolic-booking {
     padding-left: 21px;
     background-image: url(../imgs/icons/booking.png)
+}
+
+.symbolic-cart {
+    padding-left: 20px;
+    background-image: url(../imgs/icons/cart.png)
 }
 
 .symbolic-date {
