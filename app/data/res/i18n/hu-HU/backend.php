@@ -255,9 +255,9 @@ return array(
     'The address of your website\'s contact page.<br>Displayed in the header, for example.'
         => 'A weboldalának a kapcsolati címe.<br>Például a fejlécben megjelenítve.',
     'Your imprint page' => 'Az ön impresszum oldala',
-    'Your privacy policy page' => 'Az ön adatvédelmi nyilatkozat oldal',
+    'Your terms and conditions' => 'Az ön adatvédelmi nyilatkozat oldal',
     'The address of your website\'s imprint page.' => 'Az ön impresszum oldalának a címe.',
-    'The address of your website\'s privacy policy page.' => 'Az ön adatvédelmi irányelv oldalának a címe.',
+    'The address of your website\'s terms and conditions page.' => 'Az ön adatvédelmi irányelv oldalának a címe.',
     'Name of the system' => 'A rendszer neve',
     'The system presents itself under this name.<br>Displayed next to the logo, for example.'
         => 'A rendszer önmagát ezen a néven mutatja be.<br>Például ez látható a logó mellett.',

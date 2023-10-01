@@ -8,7 +8,7 @@ Options:
 - client.website                            URL
 - client.website.contact                    URL
 - client.website.imprint                    URL
-- client.website.privacy                    URL
+- client.website.terms                    URL
 
 - service.name.full
 - service.name.short

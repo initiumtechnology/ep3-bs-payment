@@ -68,6 +68,20 @@ $this->setup(array(
 
             <tr>
                 <td>
+                    <a href="<?= $this->url('backend/config/term') ?>" class="default-button" style="width: 160px; text-align: left;">
+                        <span class="symbolic symbolic-config"><?= $this->t('Terms & Conditions page') ?></span>
+                    </a>
+                </td>
+
+                <td>
+                    <p class="gray">
+                        <?= $this->t('Which text should appear on the terms & conditions page?') ?>
+                    </p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
                     <a href="<?= $this->url('backend/config/square') ?>" class="default-button" style="width: 160px; text-align: left;">
                         <span class="symbolic symbolic-config"><?= $this->option('subject.square.type.plural') ?></span>
                     </a>

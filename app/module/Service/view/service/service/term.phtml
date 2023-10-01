@@ -1,0 +1,22 @@
+<?php
+
+$this->setup(array(
+    'title' => 'Terms and Conditions', // Change the title to 'Terms and Conditions'
+    'panel' => 'centered-panel large-sized',
+    'back' => true,
+    'links' => array(
+    ),
+));
+
+$this->headScript()->appendFile($this->basePath('js/controller/service/terms.min.js'));
+
+?>
+
+<div id="help-panel">
+    <h1><?= $this->t('Terms and Conditions') ?></h1> <!-- Change the heading to 'Terms and Conditions' -->
+    
+    <div class="separator-small"></div>
+
+    <?= $this->option('subject.terms', '<p><em>' . $this->t('We are currently working on this page.') . '</em></p>') ?>
+    <!-- Update the content to your terms and conditions text -->
+</div>

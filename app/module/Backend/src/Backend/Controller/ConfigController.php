@@ -106,6 +106,26 @@ class ConfigController extends AbstractActionController
         }
     }
 
+    public function termAction()
+    {
+        $this->authorize('admin.config');
+
+        if ($this->getRequest()->isPost()) {
+            $term = $this->params()->fromPost('cf-term');
+
+            if ($term && strlen($term) > 32) {
+                $optionManager = @$this->getServiceLocator()->get('Base\Manager\OptionManager');
+                $optionManager->set('subject.term', $term, $this->config('i18n.locale'));
+
+                $this->flashMessenger()->addSuccessMessage('Term and conditions page has been saved');
+            } else {
+                $this->flashMessenger()->addErrorMessage('Term and conditions page text is too short');
+            }
+
+            return $this->redirect()->toRoute('backend/config/term');
+        }
+    }
+
     public function behaviourAction()
     {
         $this->authorize('admin.config');

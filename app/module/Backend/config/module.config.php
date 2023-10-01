@@ -281,6 +281,15 @@ return array(
                                     ),
                                 ),
                             ),
+                            'term' => array(
+                                'type' => 'Literal',
+                                'options' => array(
+                                    'route' => '/term',
+                                    'defaults' => array(
+                                        'action' => 'term',
+                                    ),
+                                ),
+                            ),
                             'square' => array(
                                 'type' => 'Literal',
                                 'options' => array(
