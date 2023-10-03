@@ -315,7 +315,8 @@ a#logo:active {
 }
 
 .calendar-table .calendar-date-col {
-    padding-left: 3px
+    padding-left: 74px;
+
 }
 
 .calendar-time-table,
