@@ -312,7 +312,7 @@ a#logo:active {
 .calendar-table,
 .calendar-table table,
 .calendar-table td {
-    text-align: center
+    text-align: center;
 }
 
 .calendar-table .calendar-date-col {
@@ -1286,7 +1286,9 @@ option {
 
 @media screen and (max-width:1280px) {
     #calendar-toolbar {
-        text-align: center
+        text-align: center;
+        position: fixed;
+        /* padding-top: 120px; */
     }
 
     #calendar-toolbar-datepicker {
@@ -1302,6 +1304,13 @@ option {
         margin-right: 8px;
         float: none
     }
+}
+
+@media screen and (max-width:700px) {
+    .calendar-table {
+        margin-top: 110px;
+    }
+
 }
 
 @media screen and (max-width:1024px) {
