@@ -1305,7 +1305,7 @@ option {
     }
 }
 
-@media screen and (max-width:700px) {
+@media screen and (max-width:1024px) {
     .calendar-table {
         margin-top: 110px;
     }
