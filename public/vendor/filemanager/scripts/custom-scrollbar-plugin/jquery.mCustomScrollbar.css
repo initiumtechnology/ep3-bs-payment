@@ -417,7 +417,7 @@ yx-axis
 	.mCSB_scrollTools .mCSB_buttonUp:hover,
 	.mCSB_scrollTools .mCSB_buttonDown:hover,
 	.mCSB_scrollTools .mCSB_buttonLeft:hover,
-	.mCSB_scrollTools .mCSB_buttonRight:hover{ opacity: 0.75; filter: "alpha(opacity=75)"; -ms-filter: "alpha(opacity=75)"; }
+	.mCSB_scrollTools .mCSB_buttonRight:hover{ filter: "alpha(opacity=75)"; -ms-filter: "alpha(opacity=75)"; }
 
 	.mCSB_scrollTools .mCSB_buttonUp:active,
 	.mCSB_scrollTools .mCSB_buttonDown:active,
