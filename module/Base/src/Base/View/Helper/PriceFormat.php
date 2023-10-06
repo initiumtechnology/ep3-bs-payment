@@ -58,7 +58,7 @@ class PriceFormat extends AbstractHelper
                 $grossFormulation = $view->t('plus');
             }
 
-            $html .= sprintf('<span class="small-text">%s %s%% %s</span>',
+            $html .= sprintf('<span class="small-text"></span>',
                 $grossFormulation, $rate, $view->t('VAT'));
         }
 

@@ -315,15 +315,13 @@ a#logo:active {
     text-align: center;
 }
 
-.calendar-table .calendar-date-col {
-    padding-left: 3px
-}
 
 .calendar-time-table,
 .calendar-date-table,
 .calendar-square-table {
     border-right: solid 1px #BBB;
-    border-bottom: solid 1px #BBB
+    border-bottom: solid 1px #BBB;
+    min-width: 80px;
 }
 
 .calendar-time-table td,
@@ -1287,8 +1285,9 @@ option {
 @media screen and (max-width:1280px) {
     #calendar-toolbar {
         text-align: center;
-        position: fixed;
-        /* padding-top: 120px; */
+        position: sticky;
+        left:0;
+        top:0
     }
 
     #calendar-toolbar-datepicker {
@@ -1306,12 +1305,6 @@ option {
     }
 }
 
-@media screen and (max-width:1024px) {
-    .calendar-table {
-        margin-top: 110px;
-    }
-
-}
 
 @media screen and (max-width:1024px) {
     .half-table {

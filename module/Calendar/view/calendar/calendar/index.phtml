@@ -6,9 +6,9 @@ $this->headScript()->appendFile($this->basePath('js/controller/calendar/index.mi
 
 <style type="text/css"> #content { padding: 0px !important; } </style>
 
-<div id="calendar" class="panel" style="width: max-content">
+<div id="calendar" class="panel" >
     <?php if ($this->squares): ?>
-        <table class="calendar-table full-width">
+        <table class="calendar-table full-width" style="white-space: nowrap;">
             <tr>
 				<?php if ($this->timeBlockCount > 1000): ?>
 					<?= $this->partial('calendar/calendar/index.landscape.phtml', $this->vars()) ?>
