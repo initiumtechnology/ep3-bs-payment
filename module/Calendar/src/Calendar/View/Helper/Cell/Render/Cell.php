@@ -235,11 +235,11 @@ class Cell extends AbstractHelper
         } else if ($match == true) {
             //syslog(LOG_EMERG, print_r('Cart cell', true));
 
-            // if (empty($cartItems[0]['dateStart'])) {
-            //     syslog(LOG_EMERG, print_r('empty array', true));
-            // } else {
-                    return $view->CalendarCellRenderCart($user, $cellLinkParams);
-            // }
+            if (empty($cartItems[0]['dateStart'])) {
+                syslog(LOG_EMERG, print_r('empty array', true));
+            } else {
+                    return $view->CalendarCellRenderCart($user, $cellLinkParams, $square);
+            }
         }
 
     }
